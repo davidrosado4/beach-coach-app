@@ -20,6 +20,11 @@
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif;font-size:16px;line-height:1.4}
+/* Layout fijo: el body no hace scroll, lo hace #app. Evita que la barra inferior "flote" en iOS. */
+html,body{height:100%;width:100%;overflow:hidden;position:fixed;inset:0;overscroll-behavior:none}
+/* Franja bajo la barra de estado (hora, batería) para que se lea sobre color */
+body::before{content:"";position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top);background:var(--primary);z-index:40}
+body.run-mode::before{background:#0f172a}
 body.noscroll{overflow:hidden}
 button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer;border:none;background:none;padding:0}
@@ -28,7 +33,9 @@ h2{font-size:1.05rem;font-weight:700;margin:22px 4px 10px;display:flex;align-ite
 h2 .t{display:inline-flex;align-items:center;gap:6px}
 h2 small{font-weight:500;color:var(--muted);font-size:.8rem}
 small{color:var(--muted)}
-#app{max-width:640px;margin:0 auto;padding:12px 14px calc(96px + env(safe-area-inset-bottom))}
+#app{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:calc(12px + env(safe-area-inset-top)) 14px calc(96px + env(safe-area-inset-bottom))}
+#app>*{max-width:640px;margin-left:auto;margin-right:auto}
+body.run-mode #app{background:#0f172a;padding-bottom:0}
 
 /* Iconos SVG */
 .ic{width:1.15em;height:1.15em;vertical-align:-.2em;flex:none;stroke-width:2;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round}
@@ -69,7 +76,7 @@ small{color:var(--muted)}
 .chips .sel{border:2px solid transparent;border-radius:999px;padding:6px 12px;font-size:.82rem;font-weight:600;background:#fff;color:var(--muted);box-shadow:var(--shadow);display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
 .chips .sel.on{border-color:var(--c,var(--primary));color:var(--c,var(--primary));background:color-mix(in srgb,var(--c,var(--primary)) 12%,#fff)}
 .chips .sel.sub{padding:4px 10px;font-size:.76rem}
-.filters{position:sticky;top:0;z-index:5;background:var(--bg);padding:8px 0 6px;margin:-4px 0 6px}
+.filters{position:sticky;top:env(safe-area-inset-top);z-index:5;background:var(--bg);padding:8px 0 6px;margin:-4px 0 6px}
 .filters .chips{overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px;scrollbar-width:none;margin-bottom:6px}
 .filters .chips::-webkit-scrollbar{display:none}
 .segbar{display:flex;background:#e7e2d6;border-radius:12px;padding:3px;margin-bottom:12px}
@@ -86,6 +93,7 @@ small{color:var(--muted)}
 .btn.block{width:100%;margin-top:8px}
 .btn:active{opacity:.85}
 .fab{position:fixed;right:18px;bottom:calc(86px + env(safe-area-inset-bottom));z-index:20;background:var(--accent);color:#fff;border-radius:999px;padding:14px 20px;font-weight:800;font-size:1rem;box-shadow:0 8px 22px rgba(249,115,22,.4);display:flex;align-items:center;gap:6px}
+@media (min-width:680px){.fab{right:calc(50% - 320px + 18px)}}
 .icon-btn{width:34px;height:34px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;background:#f1f5f9;color:#475569;font-size:.85rem}
 .icon-btn.del{background:#fee2e2;color:var(--danger)}
 .icon-btn.lg{width:40px;height:40px;border-radius:12px}
@@ -147,7 +155,8 @@ label.f input:focus,label.f select:focus,label.f textarea:focus{outline:none;bor
 .badge.empty{background:#fef3c7;color:#b45309}
 
 /* Run mode */
-.run{background:#0f172a;color:#e2e8f0;margin:-12px -14px;padding:14px 14px calc(30px + env(safe-area-inset-bottom));min-height:100vh}
+.run{background:#0f172a;color:#e2e8f0;margin:calc(-12px - env(safe-area-inset-top)) -14px 0;padding:calc(14px + env(safe-area-inset-top)) 14px calc(30px + env(safe-area-inset-bottom));min-height:100%;max-width:none}
+.run>*{max-width:640px;margin-left:auto;margin-right:auto}
 .run .page-head .back{color:#7dd3fc}
 .run .rhead{padding:8px 4px 16px}
 .run .rhead h1{font-size:1.5rem;color:#fff}
@@ -177,15 +186,15 @@ label.f input:focus,label.f select:focus,label.f textarea:focus{outline:none;bor
 .colors button.on{border-color:#1f2937}
 
 /* Tabs */
-#tabs{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:6px 4px calc(6px + env(safe-area-inset-bottom));z-index:30}
-#tabs button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px;color:var(--muted);font-size:.68rem;font-weight:600;border-radius:12px}
+#tabs{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:6px 4px calc(6px + env(safe-area-inset-bottom));z-index:30}
+#tabs button{flex:1;max-width:128px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px;color:var(--muted);font-size:.68rem;font-weight:600;border-radius:12px}
 #tabs button .ic{width:24px;height:24px;stroke-width:1.9}
 #tabs button.active{color:var(--primary)}
 #tabs button.active .ic{stroke-width:2.4}
 
 /* Modal */
 .backdrop{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:50;display:flex;align-items:flex-end;justify-content:center}
-.sheet{background:var(--bg);width:100%;max-width:640px;max-height:92vh;overflow:auto;border-radius:22px 22px 0 0;padding:14px 16px calc(20px + env(safe-area-inset-bottom));animation:up .2s ease-out}
+.sheet{background:var(--bg);width:100%;max-width:640px;max-height:calc(100% - env(safe-area-inset-top) - 24px);overflow:auto;-webkit-overflow-scrolling:touch;border-radius:22px 22px 0 0;padding:14px 16px calc(20px + env(safe-area-inset-bottom));animation:up .2s ease-out}
 @keyframes up{from{transform:translateY(30px);opacity:0}to{transform:none;opacity:1}}
 .sheet-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px}
 .sheet-head h3{font-size:1.15rem;display:flex;align-items:center;gap:8px}
@@ -332,13 +341,14 @@ const TABS = [
   { id:'ajustes',    label:'Ajustes',    icon:'sliders' },
 ];
 const TAB_OF = { hoy:'hoy', semana:'semana', entrenos:'semana', session:'semana', run:'semana', ejercicios:'ejercicios', grupos:'grupos', ajustes:'ajustes' };
-function go(view, params = {}){ route = { view, ...params }; render(); window.scrollTo(0,0); }
+function go(view, params = {}){ route = { view, ...params }; render(); document.getElementById('app').scrollTop = 0; }
 function render(){
   const views = { hoy:renderHoy, semana:renderSemana, entrenos:renderEntrenos, session:renderSession, run:renderRun, ejercicios:renderEjercicios, grupos:renderGrupos, ajustes:renderAjustes };
   document.getElementById('app').innerHTML = (views[route.view] || renderHoy)();
   const tabs = document.getElementById('tabs');
   tabs.innerHTML = TABS.map(t => `<button class="${TAB_OF[route.view]===t.id?'active':''}" onclick="go('${t.id}')">${ic(t.icon)}${t.label}</button>`).join('');
   tabs.style.display = route.view === 'run' ? 'none' : '';
+  document.body.classList.toggle('run-mode', route.view === 'run');
 }
 
 /* ============================ HELPERS UI ============================ */
@@ -426,7 +436,7 @@ function renderHoy(){
   ${slots.length ? `<div class="card plan" style="margin-top:12px">
     <div class="row between"><div class="title">${ic('calendar')} ${isSunday ? 'Es domingo: planifica la próxima semana' : 'Planificación de la semana'}</div><span class="badge ${done===slots.length?'ok':''}">${done}/${slots.length}</span></div>
     <div class="progress"><span style="width:${slots.length?Math.round(done/slots.length*100):0}%"></span></div>
-    <div class="sub">${done === slots.length ? 'Todos los entrenos de la semana están preparados.' : `Te faltan <b>${slots.length-done}</b> entrenos por preparar.`}</div>
+    <div class="sub">${done === slots.length ? 'Todos los entrenos de la semana están preparados.' : (slots.length-done === 1 ? 'Te falta <b>1</b> entreno por preparar.' : `Te faltan <b>${slots.length-done}</b> entrenos por preparar.`)}</div>
     <button class="btn ${done===slots.length?'':'accent'} block" onclick="curWeek=null;go('semana')">${ic('calendar')} Ver la semana</button>
   </div>` : ''}
 
