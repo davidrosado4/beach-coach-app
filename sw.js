@@ -1,10 +1,11 @@
 // Service worker de Beach Coach: guarda la app en caché para que funcione sin conexión.
 // Cuando cambies index.html, sube el número de versión para que los móviles se actualicen.
-const VERSION = 'beachcoach-v3';
+const VERSION = 'beachcoach-v4';
 const FILES = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(VERSION).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
+  // cache:'reload' salta la caché HTTP del navegador para traer siempre la versión nueva.
+  e.waitUntil(caches.open(VERSION).then(c => c.addAll(FILES.map(f => new Request(f, { cache:'reload' })))).then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', e => {

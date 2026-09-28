@@ -214,6 +214,9 @@ label.f input:focus,label.f select:focus,label.f textarea:focus{outline:none;bor
 <div id="modal-root"></div>
 
 <script>
+// Sube este número cada vez que cambies la app (y el VERSION de sw.js) para saber qué versión tienes en el móvil.
+const APP_VERSION = '4';
+
 /* ============================ ICONOS (SVG propios) ============================ */
 const ICONS = {
   sun:      '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
@@ -939,9 +942,17 @@ function renderAjustes(){
   <h2><span class="t">${ic('info')} Datos</span></h2>
   <div class="card">
     <div class="sub">${state.levels.length} niveles · ${state.groups.length} grupos · ${state.exercises.length} ejercicios · ${state.sessions.length} entrenos · ${TECH_CATS.length} gestos técnicos con ${Object.values(TECH_TREE).reduce((a,x)=>a+x.length,0)} subtipos</div>
+    <button class="btn block" onclick="forceUpdate()">${ic('repeat')} Buscar actualización de la app</button>
     <button class="btn danger block" onclick="resetData()">${ic('trash')} Borrar todos los datos</button>
   </div>
-  <p class="hint" style="text-align:center">Beach Coach · planificador de entrenos de vóley playa</p>`;
+  <p class="hint" style="text-align:center">Beach Coach v${APP_VERSION} · planificador de entrenos de vóley playa</p>`;
+}
+async function forceUpdate(){
+  try {
+    if ('serviceWorker' in navigator) { const regs = await navigator.serviceWorker.getRegistrations(); await Promise.all(regs.map(r => r.unregister())); }
+    if (window.caches) { const keys = await caches.keys(); await Promise.all(keys.map(k => caches.delete(k))); }
+  } catch(e) {}
+  location.reload();
 }
 function exportData(){
   const blob = new Blob([JSON.stringify(state, null, 2)], { type:'application/json' });
@@ -975,7 +986,10 @@ function resetData(){
 /* ============================ INIT ============================ */
 render();
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
-  navigator.serviceWorker.register('sw.js').catch(() => {});
+  navigator.serviceWorker.register('sw.js', { updateViaCache:'none' }).then(reg => { try { reg.update(); } catch(e){} }).catch(() => {});
+  // Cuando entra una versión nueva de la app, recarga una vez para mostrarla.
+  let hadController = !!navigator.serviceWorker.controller;
+  navigator.serviceWorker.addEventListener('controllerchange', () => { if (hadController) location.reload(); hadController = true; });
 }
 </script>
 </body>
