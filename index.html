@@ -76,8 +76,8 @@ body.run-mode #app{background:#0f172a;padding-bottom:0}
 .chips .sel{border:2px solid transparent;border-radius:999px;padding:6px 12px;font-size:.82rem;font-weight:600;background:#fff;color:var(--muted);box-shadow:var(--shadow);display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
 .chips .sel.on{border-color:var(--c,var(--primary));color:var(--c,var(--primary));background:color-mix(in srgb,var(--c,var(--primary)) 12%,#fff)}
 .chips .sel.sub{padding:4px 10px;font-size:.76rem}
-.filters{position:sticky;top:env(safe-area-inset-top);z-index:5;background:var(--bg);padding:8px 0 6px;margin:-4px 0 6px}
-.filters .chips{overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px;scrollbar-width:none;margin-bottom:6px}
+.filters{padding:4px 0 2px;margin:-4px 0 10px}
+.filters .chips{overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px;scrollbar-width:none;margin-bottom:4px}
 .filters .chips::-webkit-scrollbar{display:none}
 .segbar{display:flex;background:#e7e2d6;border-radius:12px;padding:3px;margin-bottom:12px}
 .segbar button{flex:1;padding:8px;border-radius:10px;font-weight:700;font-size:.85rem;color:var(--muted);display:inline-flex;align-items:center;justify-content:center;gap:6px}
@@ -92,7 +92,7 @@ body.run-mode #app{background:#0f172a;padding-bottom:0}
 .btn.small{padding:7px 12px;font-size:.82rem;border-radius:10px}
 .btn.block{width:100%;margin-top:8px}
 .btn:active{opacity:.85}
-.fab{position:fixed;right:18px;bottom:calc(86px + env(safe-area-inset-bottom));z-index:20;background:var(--accent);color:#fff;border-radius:999px;padding:14px 20px;font-weight:800;font-size:1rem;box-shadow:0 8px 22px rgba(249,115,22,.4);display:flex;align-items:center;gap:6px}
+.fab{position:fixed;right:18px;bottom:calc(72px + max(6px, calc(env(safe-area-inset-bottom) - 14px)));z-index:20;background:var(--accent);color:#fff;border-radius:999px;padding:14px 20px;font-weight:800;font-size:1rem;box-shadow:0 8px 22px rgba(249,115,22,.4);display:flex;align-items:center;gap:6px}
 @media (min-width:680px){.fab{right:calc(50% - 320px + 18px)}}
 .icon-btn{width:34px;height:34px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;background:#f1f5f9;color:#475569;font-size:.85rem}
 .icon-btn.del{background:#fee2e2;color:var(--danger)}
@@ -186,7 +186,7 @@ label.f input:focus,label.f select:focus,label.f textarea:focus{outline:none;bor
 .colors button.on{border-color:#1f2937}
 
 /* Tabs */
-#tabs{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:6px 4px calc(6px + env(safe-area-inset-bottom));z-index:30}
+#tabs{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:4px 4px max(6px, calc(env(safe-area-inset-bottom) - 14px));z-index:30}
 #tabs button{flex:1;max-width:128px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px;color:var(--muted);font-size:.68rem;font-weight:600;border-radius:12px}
 #tabs button .ic{width:24px;height:24px;stroke-width:1.9}
 #tabs button.active{color:var(--primary)}
@@ -215,7 +215,7 @@ label.f input:focus,label.f select:focus,label.f textarea:focus{outline:none;bor
 
 <script>
 // Sube este número cada vez que cambies la app (y el VERSION de sw.js) para saber qué versión tienes en el móvil.
-const APP_VERSION = '4';
+const APP_VERSION = '5';
 
 /* ============================ ICONOS (SVG propios) ============================ */
 const ICONS = {
