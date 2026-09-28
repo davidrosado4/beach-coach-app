@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0284c7">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Beach Coach">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<title>Beach Coach · Planificador de entrenos</title>
+<style>
+:root{
+  --bg:#f3efe6;--card:#ffffff;--text:#1f2937;--muted:#6b7280;--line:#e7e2d6;
+  --primary:#0284c7;--primary-dark:#0369a1;--accent:#f97316;--danger:#dc2626;--ok:#16a34a;
+  --radius:16px;--shadow:0 2px 10px rgba(31,41,55,.07);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif;font-size:16px;line-height:1.4}
+body.noscroll{overflow:hidden}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:none;background:none;padding:0}
+h1,h2,h3{margin:0;line-height:1.2}
+h2{font-size:1.05rem;font-weight:700;margin:22px 4px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+h2 .t{display:inline-flex;align-items:center;gap:6px}
+h2 small{font-weight:500;color:var(--muted);font-size:.8rem}
+small{color:var(--muted)}
+#app{max-width:640px;margin:0 auto;padding:12px 14px calc(96px + env(safe-area-inset-bottom))}
+
+/* Iconos SVG */
+.ic{width:1.15em;height:1.15em;vertical-align:-.2em;flex:none;stroke-width:2;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round}
+.ic.fill{fill:currentColor;stroke:none}
+
+/* Hero */
+.hero{background:linear-gradient(135deg,#0ea5e9 0%,#0284c7 55%,#f59e0b 140%);color:#fff;border-radius:22px;padding:22px 20px;box-shadow:0 8px 24px rgba(2,132,199,.25);position:relative;overflow:hidden}
+.hero .bgic{position:absolute;right:-14px;bottom:-22px;width:140px;height:140px;opacity:.16;stroke-width:1.2;transform:rotate(-12deg)}
+.hero .date{opacity:.9;font-size:.85rem;text-transform:capitalize}
+.hero h1{font-size:1.7rem;margin:4px 0 12px}
+.hero .stats{display:flex;gap:10px;flex-wrap:wrap;position:relative}
+.hero .stat{background:rgba(255,255,255,.18);border-radius:12px;padding:6px 12px;font-size:.85rem;backdrop-filter:blur(4px)}
+.hero .stat b{font-size:1.05rem;display:block}
+
+/* Cards */
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;margin-bottom:10px}
+.card.tap{cursor:pointer;transition:transform .08s}
+.card.tap:active{transform:scale(.985)}
+.card.plan{background:linear-gradient(135deg,#fff7ed,#fff);border:1.5px solid #fed7aa}
+.row{display:flex;align-items:center;gap:10px}
+.row.between{justify-content:space-between}
+.row.top{align-items:flex-start}
+.grow{flex:1;min-width:0}
+.title{font-weight:700;font-size:1rem}
+.sub{color:var(--muted);font-size:.85rem;margin-top:2px}
+.empty{text-align:center;color:var(--muted);padding:26px 14px;background:rgba(255,255,255,.55);border:2px dashed var(--line);border-radius:var(--radius);font-size:.92rem}
+.empty .ic{width:40px;height:40px;stroke-width:1.5;color:#b8b2a4;margin-bottom:6px}
+.progress{height:8px;background:#f1f5f9;border-radius:99px;overflow:hidden;margin:8px 0}
+.progress span{display:block;height:100%;background:linear-gradient(90deg,var(--primary),#38bdf8);border-radius:99px;transition:width .3s}
+
+/* Chips */
+.chip{display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:3px 10px;font-size:.78rem;font-weight:600;background:#eef2ff;color:#4338ca;margin:2px 4px 2px 0;white-space:nowrap}
+.chip.sm{padding:1px 8px;font-size:.7rem}
+.chip.all{background:#f1f5f9;color:#475569}
+.tag{display:inline-flex;align-items:center;gap:4px;background:#f1f5f9;color:#334155;border-radius:8px;padding:2px 8px;font-size:.74rem;font-weight:600;margin:2px 4px 2px 0}
+.tag.phase{color:#fff}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips .sel{border:2px solid transparent;border-radius:999px;padding:6px 12px;font-size:.82rem;font-weight:600;background:#fff;color:var(--muted);box-shadow:var(--shadow);display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.chips .sel.on{border-color:var(--c,var(--primary));color:var(--c,var(--primary));background:color-mix(in srgb,var(--c,var(--primary)) 12%,#fff)}
+.chips .sel.sub{padding:4px 10px;font-size:.76rem}
+.filters{position:sticky;top:0;z-index:5;background:var(--bg);padding:8px 0 6px;margin:-4px 0 6px}
+.filters .chips{overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px;scrollbar-width:none;margin-bottom:6px}
+.filters .chips::-webkit-scrollbar{display:none}
+.segbar{display:flex;background:#e7e2d6;border-radius:12px;padding:3px;margin-bottom:12px}
+.segbar button{flex:1;padding:8px;border-radius:10px;font-weight:700;font-size:.85rem;color:var(--muted);display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.segbar button.on{background:#fff;color:var(--primary);box-shadow:var(--shadow)}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:12px;padding:11px 16px;font-weight:700;font-size:.92rem;background:#fff;color:var(--primary);box-shadow:var(--shadow);border:1.5px solid var(--line)}
+.btn.primary{background:var(--primary);color:#fff;border-color:var(--primary)}
+.btn.accent{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn.ghost{background:transparent;box-shadow:none;border-color:transparent}
+.btn.danger{color:var(--danger);border-color:#fecaca;background:#fff}
+.btn.small{padding:7px 12px;font-size:.82rem;border-radius:10px}
+.btn.block{width:100%;margin-top:8px}
+.btn:active{opacity:.85}
+.fab{position:fixed;right:18px;bottom:calc(86px + env(safe-area-inset-bottom));z-index:20;background:var(--accent);color:#fff;border-radius:999px;padding:14px 20px;font-weight:800;font-size:1rem;box-shadow:0 8px 22px rgba(249,115,22,.4);display:flex;align-items:center;gap:6px}
+.icon-btn{width:34px;height:34px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;background:#f1f5f9;color:#475569;font-size:.85rem}
+.icon-btn.del{background:#fee2e2;color:var(--danger)}
+.icon-btn.lg{width:40px;height:40px;border-radius:12px}
+
+/* Forms */
+label.f{display:block;margin-bottom:12px;font-size:.8rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.02em}
+label.f input,label.f select,label.f textarea{display:block;width:100%;margin-top:5px;border:1.5px solid var(--line);border-radius:12px;padding:11px 12px;background:#fafaf7;font-size:1rem;font-weight:500;color:var(--text);text-transform:none;letter-spacing:0}
+label.f textarea{min-height:88px;resize:vertical}
+label.f input:focus,label.f select:focus,label.f textarea:focus{outline:none;border-color:var(--primary);background:#fff}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.seg{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.seg button{flex:1 1 30%;border:1.5px solid var(--line);border-radius:12px;padding:9px 6px;font-size:.78rem;font-weight:600;background:#fafaf7;color:var(--muted);text-transform:none;letter-spacing:0;display:inline-flex;align-items:center;justify-content:center;gap:5px}
+.seg button.on{background:var(--c);color:#fff;border-color:var(--c)}
+
+/* Page head */
+.page-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:2px 0 12px}
+.back{color:var(--primary);font-weight:700;font-size:1rem;padding:6px 4px;display:inline-flex;align-items:center;gap:2px}
+.head-actions{display:flex;gap:6px}
+
+/* Session blocks */
+.block{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:12px;overflow:hidden;border-left:6px solid var(--c)}
+.block-head{display:flex;align-items:center;gap:10px;padding:12px 14px 8px}
+.block-head .bic{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb,var(--c) 14%,#fff);color:var(--c)}
+.block-head .bic .ic{width:22px;height:22px}
+.block-head h3{font-size:1rem}
+.items{padding:0 10px}
+.item{display:grid;grid-template-columns:1fr auto;gap:6px 10px;align-items:center;padding:10px 6px;border-top:1px solid var(--line)}
+.item-main{min-width:0;cursor:pointer}
+.item-main b{display:block;font-size:.95rem}
+.item-side{display:flex;align-items:center;gap:6px}
+.item-side input{width:56px;border:1.5px solid var(--line);border-radius:10px;padding:6px 6px;text-align:center;font-weight:700;background:#fafaf7}
+.item-side .min{font-size:.75rem;color:var(--muted)}
+.item-actions{grid-column:1/-1;display:flex;gap:6px;justify-content:flex-end}
+.block-actions{display:flex;gap:8px;padding:10px 14px 14px;flex-wrap:wrap}
+.total{display:flex;justify-content:space-between;align-items:center;background:#f0f9ff;color:var(--primary-dark);border-radius:12px;padding:10px 12px;font-weight:600;margin-top:4px}
+
+/* Session list */
+.sess{display:flex;gap:12px;align-items:stretch}
+.datebox{width:58px;flex:none;background:#f0f9ff;color:var(--primary-dark);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px 0}
+.datebox b{font-size:1.35rem;line-height:1}
+.datebox span{font-size:.7rem;text-transform:uppercase;font-weight:700}
+.datebox.past{background:#f1f5f9;color:#64748b}
+.datebox.today{background:var(--accent);color:#fff}
+
+/* Semana */
+.wk-nav{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.wk-nav .lbl{flex:1;text-align:center}
+.wk-nav .lbl b{font-size:1.05rem;text-transform:capitalize}
+.wk-day{padding:12px 14px}
+.wk-day.today{border:2px solid var(--accent)}
+.wk-day .dh{display:flex;align-items:baseline;gap:8px;margin-bottom:4px}
+.wk-day .dh b{font-size:1rem}
+.wk-day .dh .free{margin-left:auto;font-size:.8rem;color:var(--muted)}
+.wk-slot{border-top:1px solid var(--line);padding:10px 0 4px;margin-top:6px}
+.wk-slot .tm{font-weight:700;color:var(--primary-dark);font-size:.85rem}
+.badge{display:inline-flex;align-items:center;gap:4px;justify-content:center;background:var(--accent);color:#fff;border-radius:999px;font-size:.7rem;font-weight:800;padding:2px 8px;white-space:nowrap}
+.badge.ok{background:#dcfce7;color:#15803d}
+.badge.todo{background:#fee2e2;color:#b91c1c}
+.badge.empty{background:#fef3c7;color:#b45309}
+
+/* Run mode */
+.run{background:#0f172a;color:#e2e8f0;margin:-12px -14px;padding:14px 14px calc(30px + env(safe-area-inset-bottom));min-height:100vh}
+.run .page-head .back{color:#7dd3fc}
+.run .rhead{padding:8px 4px 16px}
+.run .rhead h1{font-size:1.5rem;color:#fff}
+.run .rblock{margin-bottom:18px}
+.run .rblock h3{color:var(--c);font-size:.85rem;text-transform:uppercase;letter-spacing:.06em;margin:0 4px 8px;display:flex;justify-content:space-between;align-items:center}
+.run .rblock h3 span{display:inline-flex;align-items:center;gap:6px}
+.run .ritem{background:#1e293b;border-radius:14px;padding:12px 14px;margin-bottom:8px;display:flex;gap:12px;align-items:flex-start;border-left:4px solid var(--c)}
+.run .ritem.done{opacity:.45}
+.run .ritem .chk{width:26px;height:26px;border-radius:8px;border:2px solid #475569;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;margin-top:2px}
+.run .ritem.done .chk{background:var(--ok);border-color:var(--ok)}
+.run .ritem b{font-size:1.05rem;color:#fff;display:block}
+.run .ritem .d{color:#94a3b8;font-size:.9rem;white-space:pre-wrap;margin-top:4px;display:flex;gap:6px;align-items:flex-start}
+.run .ritem .d .ic{margin-top:3px;color:#64748b}
+.run .ritem .dur{color:var(--c);font-weight:800;font-size:1rem;flex:none}
+.run .notes{background:#1e293b;border-radius:14px;padding:12px 14px;white-space:pre-wrap;color:#cbd5e1}
+
+/* Schedule */
+.day{margin-bottom:8px}
+.day h4{margin:0 0 4px 4px;font-size:.8rem;text-transform:uppercase;color:var(--muted);letter-spacing:.04em}
+.slot{display:flex;align-items:center;gap:10px;background:#fff;border-radius:12px;padding:8px 12px;margin-bottom:4px;box-shadow:var(--shadow)}
+.slot .time{font-weight:700;color:var(--primary-dark);width:104px;flex:none;font-size:.9rem}
+.sched-row{display:grid;grid-template-columns:1.3fr 1fr 1fr auto;gap:6px;margin-bottom:6px;align-items:center}
+.sched-row select,.sched-row input{border:1.5px solid var(--line);border-radius:10px;padding:8px 6px;background:#fafaf7;width:100%}
+.dot{width:14px;height:14px;border-radius:50%;display:inline-block;flex:none}
+.colors{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.colors button{width:34px;height:34px;border-radius:50%;border:3px solid transparent}
+.colors button.on{border-color:#1f2937}
+
+/* Tabs */
+#tabs{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:6px 4px calc(6px + env(safe-area-inset-bottom));z-index:30}
+#tabs button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px;color:var(--muted);font-size:.68rem;font-weight:600;border-radius:12px}
+#tabs button .ic{width:24px;height:24px;stroke-width:1.9}
+#tabs button.active{color:var(--primary)}
+#tabs button.active .ic{stroke-width:2.4}
+
+/* Modal */
+.backdrop{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:50;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--bg);width:100%;max-width:640px;max-height:92vh;overflow:auto;border-radius:22px 22px 0 0;padding:14px 16px calc(20px + env(safe-area-inset-bottom));animation:up .2s ease-out}
+@keyframes up{from{transform:translateY(30px);opacity:0}to{transform:none;opacity:1}}
+.sheet-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px}
+.sheet-head h3{font-size:1.15rem;display:flex;align-items:center;gap:8px}
+.sheet .close{width:34px;height:34px;border-radius:50%;background:#e7e2d6;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.search{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:11px 14px;background:#fff;font-size:1rem;margin-bottom:8px}
+.toggle{display:inline-flex;align-items:center;gap:6px;font-size:.85rem;color:var(--muted);font-weight:600;margin-right:12px}
+.toggle input{width:18px;height:18px}
+.detail p{margin:6px 0;white-space:pre-wrap}
+.detail .k{font-size:.75rem;text-transform:uppercase;color:var(--muted);font-weight:700;letter-spacing:.04em;margin-top:12px;display:flex;align-items:center;gap:5px}
+.hint{font-size:.85rem;color:var(--muted);line-height:1.5}
+.hint ol{padding-left:18px;margin:6px 0}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<nav id="tabs"></nav>
+<div id="modal-root"></div>
+
+<script>
+/* ============================ ICONOS (SVG propios) ============================ */
+const ICONS = {
+  sun:      '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  calendar: '<rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M8 15h3M13 15h3"/>',
+  ball:     '<circle cx="12" cy="12" r="9"/><path d="M12 3c-2.5 3.5-3 8-1 12.5M12 3c4 2 6.5 6 6.5 10.5M3.4 9.5c4-.5 8 1 11 4.5M5.2 17.5c3-2.5 7-3.5 11-2.5"/>',
+  users:    '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17" cy="9" r="2.5"/><path d="M16.5 15.5a5 5 0 0 1 5 4.5"/>',
+  sliders:  '<path d="M4 6h8M16 6h4M4 12h2M10 12h10M4 18h10M18 18h2"/><circle cx="14" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="18" r="2"/>',
+  activity: '<path d="M3 12h4l3-8 4 16 3-8h4"/>',
+  target:   '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2"/>',
+  zap:      '<path d="M13 2 4 14h7l-1 8 9-12h-7l1-8z"/>',
+  gamepad:  '<rect x="2" y="7" width="20" height="11" rx="5.5"/><path d="M7 12.5h4M9 10.5v4M15 11h.01M17.5 13.5h.01"/>',
+  clock:    '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  play:     '<path d="M7 4.5v15l12-7.5z"/>',
+  copy:     '<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
+  plus:     '<path d="M12 5v14M5 12h14"/>',
+  book:     '<path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5z"/><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M9 7h7"/>',
+  edit:     '<path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
+  trash:    '<path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 11v5M14 11v5"/>',
+  check:    '<path d="M5 12l5 5L20 7"/>',
+  x:        '<path d="M6 6l12 12M18 6 6 18"/>',
+  up:       '<path d="m6 15 6-6 6 6"/>',
+  down:     '<path d="m6 9 6 6 6-6"/>',
+  left:     '<path d="m15 6-6 6 6 6"/>',
+  right:    '<path d="m9 6 6 6-6 6"/>',
+  search:   '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
+  notes:    '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/>',
+  download: '<path d="M12 3v12M6 9l6 6 6-6M4 21h16"/>',
+  upload:   '<path d="M12 15V3M6 9l6-6 6 6M4 21h16"/>',
+  share:    '<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/>',
+  bag:      '<path d="M6 8h12l1 13H5zM9 8V6a3 3 0 0 1 6 0v2"/>',
+  repeat:   '<path d="m17 2 4 4-4 4M3 11V8a2 2 0 0 1 2-2h16M7 22l-4-4 4-4M21 13v3a2 2 0 0 1-2 2H3"/>',
+  star:     '<path d="m12 3 2.8 5.8 6.2.9-4.5 4.4 1.1 6.3L12 17.4l-5.6 3 1.1-6.3L3 9.7l6.2-.9z"/>',
+  save:     '<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/>',
+  umbrella: '<path d="M12 2a10 10 0 0 1 10 10H2A10 10 0 0 1 12 2zM12 12v7a2 2 0 0 0 4 0"/>',
+  list:     '<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',
+  layers:   '<path d="m12 2 9 5-9 5-9-5z"/><path d="m3 12 9 5 9-5M3 17l9 5 9-5"/>',
+  info:     '<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>',
+  flag:     '<path d="M4 22V3M4 4h12l-2 4 2 4H4"/>',
+  hand:     '<path d="M18 11V6a2 2 0 0 0-4 0v5M14 10V4a2 2 0 0 0-4 0v6M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.9-5.9-2.8L3 15.4a2 2 0 0 1 3.3-2.3L8 15"/>',
+  wave:     '<path d="M2 12c2-2 4-2 6 0s4 2 6 0 4-2 6 0M2 17c2-2 4-2 6 0s4 2 6 0 4-2 6 0M2 7c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/>',
+  phone:    '<rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/>',
+  database: '<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/>',
+  sparkle:  '<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2 2M16 16l2 2M6 18l2-2M16 8l2-2"/>',
+};
+const ic = (n, cls = '') => `<svg class="ic ${cls}" viewBox="0 0 24 24" aria-hidden="true">${ICONS[n] || ''}</svg>`;
+
+/* ============================ CONSTANTES ============================ */
+const KEY = 'beachcoach_v1';
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const DAYS = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+const DAYS_SHORT = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+const MONTHS_SHORT = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+const WEEK_ORDER = [1,2,3,4,5,6,0];
+const PHASES = [
+  { id:'wnb',  name:'Calentamiento sin bola', short:'Sin bola',  icon:'activity', color:'#f59e0b' },
+  { id:'wb',   name:'Calentamiento con bola', short:'Con bola',  icon:'ball',     color:'#f97316' },
+  { id:'tech', name:'Gesto técnico',          short:'Técnica',   icon:'target',   color:'#0284c7' },
+  { id:'drill',name:'Ejercicios',             short:'Ejercicio', icon:'zap',      color:'#16a34a' },
+  { id:'game', name:'Juegos',                 short:'Juegos',    icon:'gamepad',  color:'#a855f7' },
+];
+
+/* Gestos técnicos → subtipos */
+const TECH_TREE = {
+  'Saque': ['Saque flotante','Saque flotante en salto','Saque en salto (potencia)','Skyball','Saque bajo / de seguridad','Saque corto','Saque largo (línea de fondo)','Saque a la línea / al lateral','Saque al jugador (débil)','Saque entre los dos','Saque táctico por zonas','Saque con viento a favor','Saque con viento en contra','Saque con sol','Rutina y ritual de saque','Saque bajo presión (marcador)'],
+  'Recepción': ['Posición base y desplazamientos','Recepción de antebrazos','Recepción de saque flotante','Recepción de saque en salto','Recepción de skyball','Recepción bola corta','Recepción bola larga / al fondo','Recepción lateral (desplazamiento)','Recepción alta (por encima del hombro)','Recepción con manos (tomahawk / puños)','Recepción con viento','Recepción con sol','Lectura del sacador','Comunicación (mía / tuya)','Dirección y altura del pase','Recepción y aproximación al ataque'],
+  'Colocación': ['Colocación de dedos','Colocación de mano baja (antebrazos)','Colocación de mano baja separada de red','Colocación separada de red','Colocación pegada a red','Colocación en carrera / desplazamiento','Colocación hacia atrás','Colocación en salto','Colocación con una mano / puño','Colocación de bola imperfecta (emergencia)','Altura y ritmo del pase (tempo)','Colocación con viento','Colocación con sol','Colocación tras defensa','Comunicación e información al atacante','Free ball / tercer toque limpio'],
+  'Ataque': ['Carrera de aproximación y salto','Remate diagonal','Remate diagonal corta (cut shot)','Remate diagonal larga','Remate línea','Remate al centro (seam)','Dejada / dink','Bola alta por línea (high line)','Rainbow (bola alta diagonal)','Poke / cobra','Jumbo / muñeca','Bola de dedos (pokey / knuckle)','Ataque desde segundo toque','Ataque en bola imperfecta','Ataque en viento','Ataque sobre bloqueo (por encima / a las manos)','Ataque contra no-bloqueo (2 atrás)','Ataque desde posición separada','Selección de golpe (lectura de defensa)','Finta y cambio de ritmo','Ataque bajo presión'],
+  'Bloqueo': ['Posición base y lectura del atacante','Bloqueo línea','Bloqueo diagonal','Bloqueo cerrado (bola)','Bloqueo abierto / manos','Señales de bloqueo','Cambio de señal en el aire','Timing del salto','Penetración de manos','Retirada del bloqueo (pull)','Bloqueo en bola separada','Transición bloqueo → ataque','Bloqueo y cobertura','Bloqueo con viento'],
+  'Defensa': ['Posición base y lectura','Defensa bola corta (dejada)','Defensa diagonal corta','Defensa diagonal larga','Defensa de línea','Defensa de bola alta / rainbow','Defensa de poke / cobra','Defensa de bola dura','Defensa con manos (por encima)','Defensa con antebrazos','Caída / plancha','Defensa tras señal del bloqueador','Defensa sin bloqueo (2 atrás)','Defensa de finta','Cobertura del compañero','Free ball / bola fácil','Defensa con viento','Defensa con sol'],
+  'K1 (side-out)': ['Recepción → colocación (secuencia)','Side-out completo','Side-out con saque fuerte','Side-out con saque flotante','Side-out en viento','Side-out por zonas de recepción','Side-out bajo presión (marcador)','Comunicación en side-out','Side-out con bola imperfecta','Ritmo y tempo del side-out'],
+  'K2 (transición)': ['Saque → bloqueo → defensa','Defensa → colocación → ataque','Transición completa','Contraataque tras bloqueo','Transición bola libre','Transición bajo presión','Ritmo y tempo de transición','Punto largo (rally)'],
+  'Táctica y lectura': ['Lectura del colocador','Lectura del atacante','Sistema de señales','Zonas de saque tácticas','Estrategia con viento','Estrategia con sol','Gestión de puntos finales','Tiempos muertos y ritmo','Scouting del rival','Comunicación en pareja','Rol de cada jugador (bloqueador / defensor)'],
+  'Control de balón': ['Toque de dedos','Toque de antebrazos','Pases en parejas','Pases en movimiento','Pepper (defensa-colocación-ataque)','Pepper avanzado','Coordinación con balón','Juegos de calentamiento con bola','Autopases y control individual'],
+  'Físico': ['Movilidad articular','Activación / core','Carrera en arena','Pliometría / saltos','Velocidad y desplazamientos','Fuerza específica','Agilidad y reacción','Prevención de lesiones (hombro / rodilla / tobillo)','Vuelta a la calma / estiramientos'],
+  'Juego': ['Juego real 2v2','Juego con puntuación condicionada','Juego con tema (wash drill)','Juego a puntos cortos','Rey de la pista','Juego 1v1','Juego 3v3 / 4v4','Juego con saque al elegido','Situaciones de partido (finales, remontadas)','Torneo interno'],
+  'Otro': [],
+};
+const TECH_CATS = Object.keys(TECH_TREE);
+const COLORS = ['#22c55e','#3b82f6','#f59e0b','#ef4444','#a855f7','#ec4899','#14b8a6','#64748b'];
+
+/* ============================ DATOS ============================ */
+function defaultState(){
+  return {
+    levels:[
+      { id:'l1', name:'Iniciación',  color:'#22c55e' },
+      { id:'l2', name:'Intermedio',  color:'#3b82f6' },
+      { id:'l3', name:'Avanzado',    color:'#f59e0b' },
+      { id:'l4', name:'Competición', color:'#ef4444' },
+    ],
+    groups:[], exercises:[], sessions:[]
+  };
+}
+function migrate(s){
+  s.sessions.forEach(x => { x.blocks = x.blocks || {}; PHASES.forEach(p => { x.blocks[p.id] = x.blocks[p.id] || []; }); x.focusSub = x.focusSub || ''; x.title = x.title || ''; x.notes = x.notes || ''; });
+  s.exercises.forEach(e => { if (e.tech === 'Juego real') e.tech = 'Juego'; e.sub = e.sub || ''; e.levelIds = e.levelIds || []; });
+  s.groups.forEach(g => { g.schedule = g.schedule || []; });
+  return s;
+}
+let state = load();
+function load(){
+  try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.levels) return migrate(Object.assign(defaultState(), s)); } catch(e){}
+  return defaultState();
+}
+function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+
+const byId  = (arr, id) => arr.find(x => x.id === id);
+const level = id => byId(state.levels, id);
+const phase = id => byId(PHASES, id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad = n => String(n).padStart(2,'0');
+const toISO = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const fromISO = iso => { const [y,m,d] = iso.split('-').map(Number); return new Date(y, m-1, d); };
+const todayISO = () => toISO(new Date());
+function fmtDateLong(d){ return d.toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long' }); }
+function fmtDate(iso){ const d = fromISO(iso); return `${DAYS_SHORT[d.getDay()]} ${d.getDate()} ${MONTHS_SHORT[d.getMonth()]}`; }
+function techLabel(ex){ return ex.tech ? (ex.sub ? `${ex.tech} · ${ex.sub}` : ex.tech) : ''; }
+
+/* ============================ ROUTER ============================ */
+let route = { view:'hoy' };
+const TABS = [
+  { id:'hoy',        label:'Hoy',        icon:'sun' },
+  { id:'semana',     label:'Semana',     icon:'calendar' },
+  { id:'ejercicios', label:'Ejercicios', icon:'ball' },
+  { id:'grupos',     label:'Grupos',     icon:'users' },
+  { id:'ajustes',    label:'Ajustes',    icon:'sliders' },
+];
+const TAB_OF = { hoy:'hoy', semana:'semana', entrenos:'semana', session:'semana', run:'semana', ejercicios:'ejercicios', grupos:'grupos', ajustes:'ajustes' };
+function go(view, params = {}){ route = { view, ...params }; render(); window.scrollTo(0,0); }
+function render(){
+  const views = { hoy:renderHoy, semana:renderSemana, entrenos:renderEntrenos, session:renderSession, run:renderRun, ejercicios:renderEjercicios, grupos:renderGrupos, ajustes:renderAjustes };
+  document.getElementById('app').innerHTML = (views[route.view] || renderHoy)();
+  const tabs = document.getElementById('tabs');
+  tabs.innerHTML = TABS.map(t => `<button class="${TAB_OF[route.view]===t.id?'active':''}" onclick="go('${t.id}')">${ic(t.icon)}${t.label}</button>`).join('');
+  tabs.style.display = route.view === 'run' ? 'none' : '';
+}
+
+/* ============================ HELPERS UI ============================ */
+function levelChips(ids, small){
+  const ls = (ids && ids.length) ? ids.map(level).filter(Boolean) : [];
+  if (!ls.length) return `<span class="chip ${small?'sm':''} all">Todos los niveles</span>`;
+  return ls.map(l => `<span class="chip ${small?'sm':''}" style="background:${l.color}22;color:${l.color}">${esc(l.name)}</span>`).join('');
+}
+function levelChip(id, small){
+  const l = level(id); if (!l) return '';
+  return `<span class="chip ${small?'sm':''}" style="background:${l.color}22;color:${l.color}">${esc(l.name)}</span>`;
+}
+function phaseTag(pid){ const p = phase(pid); return p ? `<span class="tag phase" style="background:${p.color}">${ic(p.icon)} ${esc(p.short)}</span>` : ''; }
+function techTag(ex){ const t = techLabel(ex); return t ? `<span class="tag">${esc(t)}</span>` : ''; }
+function empty(text, icon='umbrella'){ return `<div class="empty">${ic(icon)}<div>${text}</div></div>`; }
+function groupName(id){ const g = byId(state.groups, id); return g ? g.name : 'Sin grupo'; }
+function sessionTotal(s){ return PHASES.reduce((a,p) => a + (s.blocks[p.id]||[]).reduce((b,i) => b + (+i.duration||0), 0), 0); }
+function sessionCount(s){ return PHASES.reduce((a,p) => a + (s.blocks[p.id]||[]).length, 0); }
+function sessionFocus(s){ return s.focus ? (s.focusSub ? `${s.focus} · ${s.focusSub}` : s.focus) : ''; }
+function sessionTitle(s){ return s.title || (s.focus ? `Entreno de ${s.focus.toLowerCase()}` : 'Entreno'); }
+function subOptions(cat, sel){ return `<option value="">— general —</option>${(TECH_TREE[cat]||[]).map(x => `<option ${x===sel?'selected':''}>${esc(x)}</option>`).join('')}`; }
+
+/* ============================ MODAL ============================ */
+function openModal(html){
+  document.getElementById('modal-root').innerHTML = `<div class="backdrop" onclick="if(event.target===this)closeModal()"><div class="sheet">${html}</div></div>`;
+  document.body.classList.add('noscroll');
+}
+function closeModal(){ document.getElementById('modal-root').innerHTML = ''; document.body.classList.remove('noscroll'); }
+function sheetHead(title){ return `<div class="sheet-head"><h3>${title}</h3><button class="close" onclick="closeModal()">${ic('x')}</button></div>`; }
+
+/* ============================ SEMANA (datos) ============================ */
+let curWeek = null;
+function mondayOf(d){ const x = new Date(d); x.setHours(0,0,0,0); x.setDate(x.getDate() - ((x.getDay()+6)%7)); return x; }
+function defaultWeek(){ const t = new Date(); const m = mondayOf(t); if (t.getDay() === 0) m.setDate(m.getDate()+7); return toISO(m); }
+function shiftWeek(n){ const m = fromISO(curWeek || defaultWeek()); m.setDate(m.getDate() + 7*n); curWeek = toISO(m); render(); }
+function weekData(monISO){
+  const mon = fromISO(monISO);
+  return [...Array(7)].map((_, i) => {
+    const d = new Date(mon); d.setDate(mon.getDate() + i); const iso = toISO(d), dow = d.getDay();
+    const sched = state.groups.flatMap(g => g.schedule.filter(s => s.day === dow).map(s => ({ g, s, iso, session: state.sessions.find(x => x.groupId === g.id && x.date === iso) })))
+      .sort((a,b) => a.s.start.localeCompare(b.s.start));
+    const extra = state.sessions.filter(x => x.date === iso && !sched.some(k => k.session && k.session.id === x.id));
+    return { d, iso, dow, sched, extra };
+  });
+}
+function createSession(groupId, date){
+  const s = { id:uid(), groupId: groupId || (state.groups[0] ? state.groups[0].id : ''), date: date || todayISO(),
+    focus:'', focusSub:'', title:'', notes:'', blocks:{} };
+  PHASES.forEach(p => s.blocks[p.id] = []);
+  state.sessions.push(s); save(); return s;
+}
+function newSession(groupId, date){ const s = createSession(groupId, date); go('session', { id:s.id }); }
+function prepareWeek(){
+  const missing = weekData(curWeek || defaultWeek()).flatMap(x => x.sched.filter(k => !k.session));
+  if (!missing.length) return;
+  if (!confirm(`Se crearán ${missing.length} entrenos vacíos para que los rellenes uno a uno. ¿Continuar?`)) return;
+  missing.forEach(k => createSession(k.g.id, k.iso)); render();
+}
+function copyLast(groupId, iso){
+  const prev = state.sessions.filter(x => x.groupId === groupId && x.date < iso && sessionCount(x) > 0).sort((a,b) => b.date.localeCompare(a.date))[0];
+  if (!prev) { alert('Este grupo todavía no tiene entrenos anteriores con contenido.'); return; }
+  const c = JSON.parse(JSON.stringify(prev)); c.id = uid(); c.date = iso; state.sessions.push(c); save(); go('session', { id:c.id });
+}
+
+/* ============================ HOY ============================ */
+function renderHoy(){
+  const today = new Date(), dow = today.getDay(), iso = todayISO();
+  const todays = state.groups.flatMap(g => g.schedule.filter(s => s.day === dow).map(s => ({ g, s }))).sort((a,b) => a.s.start.localeCompare(b.s.start));
+  const wk = weekData(defaultWeek());
+  const slots = wk.flatMap(x => x.sched); const done = slots.filter(k => k.session).length;
+  const isSunday = dow === 0;
+  const upcoming = state.sessions.filter(s => s.date > iso).sort((a,b) => a.date.localeCompare(b.date)).slice(0, 4);
+  return `
+  <div class="hero">
+    ${ic('ball','bgic')}
+    <div class="date">${fmtDateLong(today)}</div>
+    <h1>Hola, coach</h1>
+    <div class="stats">
+      <div class="stat"><b>${state.exercises.length}</b>ejercicios</div>
+      <div class="stat"><b>${state.groups.length}</b>grupos</div>
+      <div class="stat"><b>${state.sessions.length}</b>entrenos</div>
+    </div>
+  </div>
+
+  ${slots.length ? `<div class="card plan" style="margin-top:12px">
+    <div class="row between"><div class="title">${ic('calendar')} ${isSunday ? 'Es domingo: planifica la próxima semana' : 'Planificación de la semana'}</div><span class="badge ${done===slots.length?'ok':''}">${done}/${slots.length}</span></div>
+    <div class="progress"><span style="width:${slots.length?Math.round(done/slots.length*100):0}%"></span></div>
+    <div class="sub">${done === slots.length ? 'Todos los entrenos de la semana están preparados.' : `Te faltan <b>${slots.length-done}</b> entrenos por preparar.`}</div>
+    <button class="btn ${done===slots.length?'':'accent'} block" onclick="curWeek=null;go('semana')">${ic('calendar')} Ver la semana</button>
+  </div>` : ''}
+
+  <h2><span class="t">${ic('sun')} Entrenos de hoy</span></h2>
+  ${todays.length ? todays.map(({g,s}) => {
+      const ses = state.sessions.find(x => x.groupId === g.id && x.date === iso);
+      return `<div class="card">
+        <div class="row between">
+          <div class="grow"><div class="title">${esc(g.name)}</div><div class="sub">${ic('clock')} ${s.start} – ${s.end} ${levelChip(g.levelId, true)}</div></div>
+          ${ses ? `<span class="badge">${sessionTotal(ses)} min</span>` : ''}
+        </div>
+        ${ses ? `<div class="sub" style="margin-top:6px">${esc(sessionTitle(ses))} · ${sessionCount(ses)} ejercicios</div>
+          <div class="row" style="margin-top:10px"><button class="btn small grow" onclick="go('session',{id:'${ses.id}'})">${ic('edit')} Editar</button><button class="btn small primary grow" onclick="go('run',{id:'${ses.id}'})">${ic('play','fill')} Modo entreno</button></div>`
+        : `<button class="btn accent block" onclick="newSession('${g.id}','${iso}')">${ic('plus')} Preparar el entreno</button>`}
+      </div>`;
+    }).join('') : (state.groups.length ? empty('Hoy no tienes grupos programados. Día libre.','umbrella') : empty('Empieza creando tus grupos y horarios en la pestaña <b>Grupos</b>.','users'))}
+
+  <h2><span class="t">${ic('flag')} Próximos entrenos</span></h2>
+  ${upcoming.length ? upcoming.map(sessionCard).join('') : empty('No hay entrenos planificados. Ve a <b>Semana</b> para prepararlos.','calendar')}`;
+}
+
+/* ============================ SEMANA (vista) ============================ */
+function renderSemana(){
+  const monISO = curWeek || defaultWeek();
+  const wk = weekData(monISO);
+  const mon = wk[0].d, sun = wk[6].d, todayIso = todayISO();
+  const thisMon = toISO(mondayOf(new Date()));
+  const rel = monISO === thisMon ? 'Esta semana' : (monISO === toISO(new Date(mondayOf(new Date()).getTime() + 7*864e5)) ? 'Próxima semana' : (monISO < thisMon ? 'Semana pasada' : ''));
+  const slots = wk.flatMap(x => x.sched); const done = slots.filter(k => k.session).length; const missing = slots.length - done;
+  const totalMin = wk.flatMap(x => [...x.sched.map(k => k.session), ...x.extra]).filter(Boolean).reduce((a,s) => a + sessionTotal(s), 0);
+  return `
+  <div class="segbar"><button class="on">${ic('calendar')} Semana</button><button onclick="go('entrenos')">${ic('list')} Todos los entrenos</button></div>
+  <div class="wk-nav">
+    <button class="icon-btn lg" onclick="shiftWeek(-1)">${ic('left')}</button>
+    <div class="lbl"><b>${mon.getDate()} ${MONTHS_SHORT[mon.getMonth()]} – ${sun.getDate()} ${MONTHS_SHORT[sun.getMonth()]}</b><br><small>${rel || `Semana del ${mon.getDate()}`}</small></div>
+    <button class="icon-btn lg" onclick="shiftWeek(1)">${ic('right')}</button>
+  </div>
+  ${slots.length ? `<div class="card plan">
+    <div class="row between"><div class="title">${done}/${slots.length} entrenos preparados</div><small>${totalMin} min en total</small></div>
+    <div class="progress"><span style="width:${Math.round(done/slots.length*100)}%"></span></div>
+    ${missing ? `<button class="btn accent block" onclick="prepareWeek()">${ic('sparkle')} ${missing === 1 ? 'Crear el que falta' : `Crear los ${missing} que faltan`}</button>` : `<div class="sub">${ic('check')} Semana completa. ¡A la arena!</div>`}
+  </div>` : (state.groups.length ? '' : empty('Crea tus grupos con horario en <b>Grupos</b> y aquí aparecerá tu semana.','users'))}
+  ${wk.map(day => {
+    const isToday = day.iso === todayIso;
+    return `<div class="card wk-day ${isToday?'today':''}">
+      <div class="dh"><b>${DAYS[day.dow]}</b><small>${day.d.getDate()} ${MONTHS_SHORT[day.d.getMonth()]}</small>${isToday ? '<span class="badge">Hoy</span>' : ''}${!day.sched.length && !day.extra.length ? '<span class="free">Libre</span>' : ''}</div>
+      ${day.sched.map(k => weekSlot(k.g, `${k.s.start}–${k.s.end}`, k.session, k.iso)).join('')}
+      ${day.extra.map(x => weekSlot(byId(state.groups, x.groupId), 'Extra', x, day.iso)).join('')}
+      <button class="btn ghost small" style="margin-top:6px;padding-left:4px" onclick="newSession('', '${day.iso}')">${ic('plus')} Añadir otro entreno</button>
+    </div>`; }).join('')}`;
+}
+function weekSlot(g, time, ses, iso){
+  const hasPrev = g && state.sessions.some(x => x.groupId === g.id && x.date < iso && sessionCount(x) > 0);
+  return `<div class="wk-slot">
+    <div class="row between top">
+      <div class="grow"><b>${esc(g ? g.name : 'Sin grupo')}</b> ${g ? levelChip(g.levelId, true) : ''}<div class="tm">${ic('clock')} ${time}</div></div>
+      ${ses ? (sessionCount(ses) ? `<span class="badge ok">${ic('check')} ${sessionTotal(ses)} min</span>` : `<span class="badge empty">Vacío</span>`) : `<span class="badge todo">Sin preparar</span>`}
+    </div>
+    ${ses ? `<div class="sub">${esc(sessionTitle(ses))}${sessionFocus(ses) ? ` · ${esc(sessionFocus(ses))}` : ''} · ${sessionCount(ses)} ej.</div>
+      <div class="row" style="margin-top:8px">
+        <button class="btn small grow" onclick="go('session',{id:'${ses.id}'})">${ic('edit')} Editar</button>
+        <button class="btn small primary grow" onclick="go('run',{id:'${ses.id}'})">${ic('play','fill')} Entreno</button>
+      </div>`
+    : `<div class="row" style="margin-top:8px">
+        <button class="btn small accent grow" onclick="newSession('${g?g.id:''}','${iso}')">${ic('plus')} Preparar</button>
+        ${hasPrev ? `<button class="btn small grow" onclick="copyLast('${g.id}','${iso}')">${ic('copy')} Copiar último</button>` : ''}
+      </div>`}
+  </div>`;
+}
+
+/* ============================ ENTRENOS (lista) ============================ */
+function sessionCard(s){
+  const d = fromISO(s.date), iso = todayISO();
+  const cls = s.date === iso ? 'today' : (s.date < iso ? 'past' : '');
+  const g = byId(state.groups, s.groupId);
+  return `<div class="card tap" onclick="go('session',{id:'${s.id}'})">
+    <div class="sess">
+      <div class="datebox ${cls}"><span>${DAYS_SHORT[d.getDay()]}</span><b>${d.getDate()}</b><span>${MONTHS_SHORT[d.getMonth()]}</span></div>
+      <div class="grow">
+        <div class="title">${esc(sessionTitle(s))}</div>
+        <div class="sub">${esc(groupName(s.groupId))} ${g ? levelChip(g.levelId, true) : ''}</div>
+        <div class="sub">${sessionCount(s)} ejercicios · ${sessionTotal(s)} min${sessionFocus(s) ? ` · ${esc(sessionFocus(s))}` : ''}</div>
+      </div>
+    </div></div>`;
+}
+function renderEntrenos(){
+  const iso = todayISO();
+  const up = state.sessions.filter(s => s.date >= iso).sort((a,b) => a.date.localeCompare(b.date));
+  const past = state.sessions.filter(s => s.date < iso).sort((a,b) => b.date.localeCompare(a.date));
+  return `
+  <div class="segbar"><button onclick="go('semana')">${ic('calendar')} Semana</button><button class="on">${ic('list')} Todos los entrenos</button></div>
+  <h2><span class="t">Próximos</span><small>${up.length}</small></h2>
+  ${up.length ? up.map(sessionCard).join('') : empty('Nada planificado todavía.','calendar')}
+  ${past.length ? `<h2><span class="t">Anteriores</span><small>${past.length}</small></h2>${past.map(sessionCard).join('')}` : ''}
+  <button class="fab" onclick="newSession()">${ic('plus')} Nuevo entreno</button>`;
+}
+
+/* ============================ EDITOR DE ENTRENO ============================ */
+function updSession(id, k, v){ const s = byId(state.sessions, id); if (!s) return; s[k] = v; if (k === 'focus') s.focusSub = ''; save(); render(); }
+function deleteSession(id){
+  if (!confirm('¿Eliminar este entreno?')) return;
+  state.sessions = state.sessions.filter(s => s.id !== id); save(); go('semana');
+}
+function duplicateSession(id){
+  const s = byId(state.sessions, id); if (!s) return;
+  const c = JSON.parse(JSON.stringify(s)); c.id = uid(); state.sessions.push(c); save(); go('session', { id:c.id });
+}
+function updItem(sid, pid, idx, k, v){ const s = byId(state.sessions, sid); s.blocks[pid][idx][k] = k === 'duration' ? +v : v; save(); render(); }
+function moveItem(sid, pid, idx, dir){
+  const arr = byId(state.sessions, sid).blocks[pid]; const j = idx + dir;
+  if (j < 0 || j >= arr.length) return; [arr[idx], arr[j]] = [arr[j], arr[idx]]; save(); render();
+}
+function removeItem(sid, pid, idx){ byId(state.sessions, sid).blocks[pid].splice(idx, 1); save(); render(); }
+function addToSession(sid, pid, exId){
+  const s = byId(state.sessions, sid), ex = byId(state.exercises, exId); if (!s || !ex) return;
+  s.blocks[pid] = s.blocks[pid] || []; s.blocks[pid].push({ exId, duration: ex.duration || 10 }); save();
+}
+
+function renderSession(){
+  const s = byId(state.sessions, route.id); if (!s) return renderSemana();
+  const total = sessionTotal(s);
+  return `
+  <div class="page-head">
+    <button class="back" onclick="go('semana')">${ic('left')} Semana</button>
+    <div class="head-actions">
+      <button class="btn small" onclick="duplicateSession('${s.id}')">${ic('copy')} Duplicar</button>
+      <button class="btn small primary" onclick="go('run',{id:'${s.id}'})">${ic('play','fill')} Modo entreno</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="grid2">
+      <label class="f">Grupo<select onchange="updSession('${s.id}','groupId',this.value)">
+        <option value="">— sin grupo —</option>
+        ${state.groups.map(g => `<option value="${g.id}" ${g.id===s.groupId?'selected':''}>${esc(g.name)} · ${esc(level(g.levelId)?.name||'')}</option>`).join('')}
+      </select></label>
+      <label class="f">Fecha<input type="date" value="${s.date}" onchange="updSession('${s.id}','date',this.value)"></label>
+    </div>
+    <div class="grid2">
+      <label class="f">Gesto técnico principal<select onchange="updSession('${s.id}','focus',this.value)">
+        <option value="">— elegir —</option>${TECH_CATS.map(t => `<option ${t===s.focus?'selected':''}>${t}</option>`).join('')}
+      </select></label>
+      <label class="f">Subtipo<select ${!s.focus || !TECH_TREE[s.focus].length ? 'disabled' : ''} onchange="updSession('${s.id}','focusSub',this.value)">${subOptions(s.focus, s.focusSub)}</select></label>
+    </div>
+    <label class="f">Título (opcional)<input value="${esc(s.title)}" placeholder="p.ej. Recepción bajo presión" onchange="updSession('${s.id}','title',this.value)"></label>
+    <div class="total"><span>${ic('clock')} Duración total</span><b>${total} min</b></div>
+  </div>
+  ${PHASES.map(p => renderBlock(s, p)).join('')}
+  <div class="card"><label class="f">Notas del entreno<textarea placeholder="Recordatorios, material, quién falta..." onchange="updSession('${s.id}','notes',this.value)">${esc(s.notes)}</textarea></label></div>
+  <button class="btn danger block" onclick="deleteSession('${s.id}')">${ic('trash')} Eliminar entreno</button>`;
+}
+function renderBlock(s, p){
+  const items = s.blocks[p.id] || [];
+  const sub = items.reduce((a,i) => a + (+i.duration||0), 0);
+  const g = byId(state.groups, s.groupId);
+  const name = p.id === 'tech' && s.focus ? `${p.name}: ${esc(sessionFocus(s))}` : p.name;
+  const pre = JSON.stringify({ phase:p.id, tech: p.id==='tech' ? s.focus : '', sub: p.id==='tech' ? s.focusSub : '', levelIds: g ? [g.levelId] : [], addTo:{ sessionId:s.id, phase:p.id } });
+  return `<section class="block" style="--c:${p.color}">
+    <div class="block-head"><div class="bic">${ic(p.icon)}</div><div class="grow"><h3>${name}</h3><small>${items.length} ejercicio${items.length===1?'':'s'} · ${sub} min</small></div></div>
+    <div class="items">${items.map((it, idx) => {
+      const ex = byId(state.exercises, it.exId);
+      return `<div class="item">
+        <div class="item-main" onclick="${ex?`openExercise('${ex.id}')`:''}">
+          <b>${esc(ex ? ex.name : '(ejercicio eliminado)')}</b>
+          ${ex ? `${techTag(ex)}${levelChips(ex.levelIds, true)}` : ''}
+        </div>
+        <div class="item-side"><input type="number" min="0" inputmode="numeric" value="${it.duration}" onchange="updItem('${s.id}','${p.id}',${idx},'duration',this.value)"><span class="min">min</span></div>
+        <div class="item-actions">
+          <button class="icon-btn" onclick="moveItem('${s.id}','${p.id}',${idx},-1)">${ic('up')}</button>
+          <button class="icon-btn" onclick="moveItem('${s.id}','${p.id}',${idx},1)">${ic('down')}</button>
+          <button class="icon-btn del" onclick="removeItem('${s.id}','${p.id}',${idx})">${ic('x')}</button>
+        </div>
+      </div>`; }).join('')}</div>
+    <div class="block-actions">
+      <button class="btn small primary" onclick="openPicker('${s.id}','${p.id}')">${ic('book')} De la batería</button>
+      <button class="btn small" onclick='openExerciseForm(null,${esc(pre)})'>${ic('plus')} Crear nuevo</button>
+    </div>
+  </section>`;
+}
+
+/* ---- Selector de ejercicios de la batería ---- */
+let picker = null;
+function openPicker(sessionId, phaseId){ picker = { sessionId, phaseId, onlyPhase:true, onlyLevel:true, q:'' }; renderPicker(); }
+function pickerSet(k, v){ picker[k] = v; renderPicker(); }
+function pickerAdd(exId){ addToSession(picker.sessionId, picker.phaseId, exId); render(); renderPicker(); }
+function pickerFiltered(){
+  const s = byId(state.sessions, picker.sessionId); const g = byId(state.groups, s.groupId);
+  const q = picker.q.trim().toLowerCase();
+  const list = state.exercises.filter(ex =>
+    (!picker.onlyPhase || ex.phase === picker.phaseId) &&
+    (!picker.onlyLevel || !g || !ex.levelIds.length || ex.levelIds.includes(g.levelId)) &&
+    (!q || (ex.name + ' ' + techLabel(ex) + ' ' + (ex.description||'')).toLowerCase().includes(q))
+  ).sort((a,b) => a.name.localeCompare(b.name));
+  if (picker.phaseId === 'tech' && s.focus) {
+    const score = ex => (ex.tech === s.focus ? 1 : 0) + (s.focusSub && ex.sub === s.focusSub ? 2 : 0);
+    list.sort((a,b) => score(b) - score(a));
+  }
+  return { s, g, list, inSession: new Set((s.blocks[picker.phaseId]||[]).map(i => i.exId)) };
+}
+function renderPicker(){
+  const { s, g, list, inSession } = pickerFiltered(); const p = phase(picker.phaseId);
+  openModal(`${sheetHead(`${ic(p.icon)} Añadir · ${esc(p.short)}`)}
+    <input class="search" placeholder="Buscar ejercicio..." value="${esc(picker.q)}" oninput="picker.q=this.value;renderPickerList()">
+    <div style="margin-bottom:10px">
+      <label class="toggle"><input type="checkbox" ${picker.onlyPhase?'checked':''} onchange="pickerSet('onlyPhase',this.checked)">Solo ${esc(p.short.toLowerCase())}</label>
+      ${g ? `<label class="toggle"><input type="checkbox" ${picker.onlyLevel?'checked':''} onchange="pickerSet('onlyLevel',this.checked)">Solo ${esc(level(g.levelId)?.name||'mi nivel')}</label>` : ''}
+    </div>
+    <div id="picker-list">${pickerList(list, inSession, s)}</div>`);
+  const inp = document.querySelector('.sheet .search'); if (inp && picker.q) { inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length); }
+}
+function renderPickerList(){ const { s, list, inSession } = pickerFiltered(); document.getElementById('picker-list').innerHTML = pickerList(list, inSession, s); }
+function pickerList(list, inSession, s){
+  if (!list.length) return empty('No hay ejercicios con estos filtros.<br><small>Quita filtros o crea uno nuevo desde el bloque.</small>','search');
+  return list.map(ex => { const match = s.focus && ex.tech === s.focus && (!s.focusSub || ex.sub === s.focusSub);
+    return `<div class="card" style="padding:12px">
+    <div class="row">
+      <div class="grow" onclick="openExercise('${ex.id}',true)">
+        <div class="title">${match ? `<span style="color:var(--accent)">${ic('star','fill')}</span> ` : ''}${esc(ex.name)}</div>
+        <div class="sub">${phaseTag(ex.phase)}${techTag(ex)}${levelChips(ex.levelIds, true)}</div>
+        <div class="sub">${ic('clock')} ${ex.duration||'?'} min${ex.players ? ` · ${ic('users')} ${esc(ex.players)}` : ''}</div>
+      </div>
+      <button class="btn small ${inSession.has(ex.id)?'':'primary'}" onclick="pickerAdd('${ex.id}')">${ic('plus')} ${inSession.has(ex.id) ? 'Otra vez' : 'Añadir'}</button>
+    </div></div>`; }).join('');
+}
+
+/* ============================ MODO ENTRENO ============================ */
+let done = {};
+function toggleDone(k){ done[k] = !done[k]; render(); }
+function renderRun(){
+  const s = byId(state.sessions, route.id); if (!s) return renderSemana();
+  const g = byId(state.groups, s.groupId);
+  return `<div class="run">
+    <div class="page-head"><button class="back" onclick="go('session',{id:'${s.id}'})">${ic('left')} Salir</button><span style="color:#94a3b8;font-weight:700">${ic('clock')} ${sessionTotal(s)} min</span></div>
+    <div class="rhead">
+      <div style="color:#7dd3fc;font-weight:700;font-size:.85rem">${fmtDate(s.date)} · ${esc(groupName(s.groupId))}${g ? ` · ${esc(level(g.levelId)?.name||'')}` : ''}</div>
+      <h1>${esc(sessionTitle(s))}</h1>
+      ${sessionFocus(s) ? `<div style="color:#94a3b8;margin-top:4px">${ic('target')} ${esc(sessionFocus(s))}</div>` : ''}
+    </div>
+    ${PHASES.map(p => {
+      const items = s.blocks[p.id] || []; if (!items.length) return '';
+      const sub = items.reduce((a,i) => a + (+i.duration||0), 0);
+      return `<div class="rblock" style="--c:${p.color}">
+        <h3><span>${ic(p.icon)} ${p.id==='tech' && s.focus ? esc(sessionFocus(s)) : p.name}</span><span>${sub} min</span></h3>
+        ${items.map((it, idx) => { const ex = byId(state.exercises, it.exId); const k = `${s.id}-${p.id}-${idx}`;
+          return `<div class="ritem ${done[k]?'done':''}" onclick="toggleDone('${k}')">
+            <div class="chk">${done[k]?ic('check'):''}</div>
+            <div class="grow"><b>${esc(ex ? ex.name : '(eliminado)')}</b>
+              ${ex && ex.sub ? `<div class="d"><span style="color:#94a3b8;font-size:.8rem">${esc(techLabel(ex))}</span></div>` : ''}
+              ${ex && ex.description ? `<div class="d">${ic('info')}<span>${esc(ex.description)}</span></div>` : ''}
+              ${ex && ex.material ? `<div class="d">${ic('bag')}<span>${esc(ex.material)}</span></div>` : ''}
+              ${ex && ex.variants ? `<div class="d">${ic('repeat')}<span>${esc(ex.variants)}</span></div>` : ''}
+            </div>
+            <div class="dur">${it.duration}'</div>
+          </div>`; }).join('')}
+      </div>`; }).join('')}
+    ${s.notes ? `<div class="rblock" style="--c:#94a3b8"><h3><span>${ic('notes')} Notas</span></h3><div class="notes">${esc(s.notes)}</div></div>` : ''}
+  </div>`;
+}
+
+/* ============================ EJERCICIOS ============================ */
+let exFilter = { q:'', level:'', phase:'', tech:'', sub:'' };
+function setFilter(k, v){ exFilter[k] = exFilter[k] === v ? '' : v; if (k === 'tech') exFilter.sub = ''; render(); }
+function exFiltered(){
+  const q = exFilter.q.trim().toLowerCase();
+  return state.exercises.filter(ex =>
+    (!exFilter.level || !ex.levelIds.length || ex.levelIds.includes(exFilter.level)) &&
+    (!exFilter.phase || ex.phase === exFilter.phase) &&
+    (!exFilter.tech || ex.tech === exFilter.tech) &&
+    (!exFilter.sub || ex.sub === exFilter.sub) &&
+    (!q || (ex.name + ' ' + techLabel(ex) + ' ' + (ex.description||'') + ' ' + (ex.material||'')).toLowerCase().includes(q))
+  ).sort((a,b) => a.name.localeCompare(b.name));
+}
+function renderEjercicios(){
+  const subs = exFilter.tech ? TECH_TREE[exFilter.tech] : [];
+  return `
+  <div class="filters">
+    <input class="search" placeholder="Buscar en la batería..." value="${esc(exFilter.q)}" oninput="exFilter.q=this.value;renderExList()">
+    <div class="chips">
+      ${state.levels.map(l => `<button class="sel ${exFilter.level===l.id?'on':''}" style="--c:${l.color}" onclick="setFilter('level','${l.id}')">${esc(l.name)}</button>`).join('')}
+    </div>
+    <div class="chips">
+      ${PHASES.map(p => `<button class="sel ${exFilter.phase===p.id?'on':''}" style="--c:${p.color}" onclick="setFilter('phase','${p.id}')">${ic(p.icon)} ${p.short}</button>`).join('')}
+    </div>
+    <div class="chips">
+      ${TECH_CATS.map(t => `<button class="sel ${exFilter.tech===t?'on':''}" onclick="setFilter('tech','${t.replace(/'/g,"\\'")}')">${t}</button>`).join('')}
+    </div>
+    ${subs.length ? `<div class="chips">${subs.map(t => `<button class="sel sub ${exFilter.sub===t?'on':''}" style="--c:#7c3aed" onclick="setFilter('sub','${t.replace(/'/g,"\\'")}')">${t}</button>`).join('')}</div>` : ''}
+  </div>
+  <div id="ex-list">${exListHtml(exFiltered())}</div>
+  <button class="fab" onclick="openExerciseForm(null,{phase:exFilter.phase||'drill',tech:exFilter.tech||'',sub:exFilter.sub||'',levelIds:exFilter.level?[exFilter.level]:[]})">${ic('plus')} Ejercicio</button>`;
+}
+function renderExList(){ document.getElementById('ex-list').innerHTML = exListHtml(exFiltered()); }
+function exListHtml(list){
+  if (!list.length) return empty(state.exercises.length ? 'Ningún ejercicio coincide con los filtros.' : 'Tu batería está vacía. Pulsa <b>Ejercicio</b> para crear el primero.','ball');
+  let groups;
+  if (exFilter.tech) {
+    const order = ['', ...(TECH_TREE[exFilter.tech]||[])];
+    groups = order.map(sub => ({ key: sub || 'General', icon:'target', color:'#7c3aed', items: list.filter(e => e.sub === sub) })).filter(x => x.items.length);
+  } else {
+    groups = PHASES.map(p => ({ key: p.name, icon: p.icon, color: p.color, items: list.filter(e => e.phase === p.id) })).filter(x => x.items.length);
+  }
+  return groups.map(({key, icon, color, items}) => `
+    <h2><span class="t" style="color:${color}">${ic(icon)} ${esc(key)}</span><small>${items.length}</small></h2>
+    ${items.map(ex => `<div class="card tap" onclick="openExercise('${ex.id}')">
+      <div class="row between"><div class="title grow">${esc(ex.name)}</div><small>${ic('clock')} ${ex.duration||'?'}'</small></div>
+      <div class="sub">${exFilter.tech ? phaseTag(ex.phase) : ''}${techTag(ex)}${levelChips(ex.levelIds, true)}</div>
+      ${ex.description ? `<div class="sub" style="margin-top:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${esc(ex.description)}</div>` : ''}
+    </div>`).join('')}`).join('');
+}
+
+/* ---- Detalle de ejercicio ---- */
+function openExercise(id, fromPicker){
+  const ex = byId(state.exercises, id); if (!ex) return;
+  const uses = state.sessions.filter(s => PHASES.some(ph => (s.blocks[ph.id]||[]).some(i => i.exId === id))).length;
+  openModal(`${sheetHead(esc(ex.name))}
+    <div class="card detail">
+      <div>${phaseTag(ex.phase)}${techTag(ex)}</div>
+      <div style="margin-top:6px">${levelChips(ex.levelIds)}</div>
+      <div class="row" style="margin-top:10px;gap:16px"><span>${ic('clock')} <b>${ex.duration||'?'} min</b></span>${ex.players ? `<span>${ic('users')} <b>${esc(ex.players)}</b></span>` : ''}</div>
+      ${ex.description ? `<div class="k">${ic('info')} Descripción</div><p>${esc(ex.description)}</p>` : ''}
+      ${ex.material ? `<div class="k">${ic('bag')} Material</div><p>${esc(ex.material)}</p>` : ''}
+      ${ex.variants ? `<div class="k">${ic('repeat')} Variantes / progresiones</div><p>${esc(ex.variants)}</p>` : ''}
+      <div class="k">${ic('calendar')} Usado en ${uses} entreno${uses===1?'':'s'}</div>
+    </div>
+    <div class="row">
+      ${fromPicker ? `<button class="btn primary grow" onclick="pickerAdd('${ex.id}')">${ic('plus')} Añadir al entreno</button>` : ''}
+      <button class="btn grow" onclick="openExerciseForm('${ex.id}')">${ic('edit')} Editar</button>
+    </div>
+    ${fromPicker ? `<button class="btn ghost block" onclick="renderPicker()">${ic('left')} Volver a la lista</button>` : ''}`);
+}
+
+/* ---- Formulario de ejercicio ---- */
+let form = null;
+function openExerciseForm(id, pre = {}){
+  const ex = id ? byId(state.exercises, id) : null;
+  form = { id, addTo: pre.addTo || null,
+    data: ex ? JSON.parse(JSON.stringify(ex)) : { name:'', phase: pre.phase || 'drill', tech: pre.tech || '', sub: pre.sub || '', levelIds: pre.levelIds || [], duration:10, players:'', material:'', description:'', variants:'' } };
+  renderExerciseForm();
+}
+function fset(k, v){ form.data[k] = v; }
+function fSetTech(v){ form.data.tech = v; form.data.sub = ''; renderExerciseForm(); }
+function fToggleLevel(id){ const a = form.data.levelIds; const i = a.indexOf(id); i >= 0 ? a.splice(i,1) : a.push(id); renderExerciseForm(); }
+function fSetPhase(p){ form.data.phase = p; renderExerciseForm(); }
+function renderExerciseForm(){
+  const d = form.data; const subs = TECH_TREE[d.tech] || [];
+  openModal(`${sheetHead(form.id ? `${ic('edit')} Editar ejercicio` : `${ic('plus')} Nuevo ejercicio`)}
+    <label class="f">Nombre<input id="f-name" value="${esc(d.name)}" placeholder="p.ej. Recepción 2 vs 2 con saque flotante" oninput="fset('name',this.value)"></label>
+    <label class="f">Fase del entreno
+      <div class="seg">${PHASES.map(p => `<button type="button" class="${d.phase===p.id?'on':''}" style="--c:${p.color}" onclick="fSetPhase('${p.id}')">${ic(p.icon)} ${p.short}</button>`).join('')}</div>
+    </label>
+    <div class="grid2">
+      <label class="f">Gesto técnico<select onchange="fSetTech(this.value)">
+        <option value="">— ninguno —</option>${TECH_CATS.map(t => `<option ${t===d.tech?'selected':''}>${t}</option>`).join('')}
+      </select></label>
+      <label class="f">Subtipo<select ${subs.length ? '' : 'disabled'} onchange="fset('sub',this.value)">${subOptions(d.tech, d.sub)}</select></label>
+    </div>
+    <label class="f">Niveles <small style="text-transform:none;font-weight:500">(ninguno = vale para todos)</small>
+      <div class="chips" style="margin-top:6px">${state.levels.map(l => `<button type="button" class="sel ${d.levelIds.includes(l.id)?'on':''}" style="--c:${l.color}" onclick="fToggleLevel('${l.id}')">${esc(l.name)}</button>`).join('')}</div>
+    </label>
+    <div class="grid2">
+      <label class="f">Duración (min)<input type="number" min="0" inputmode="numeric" value="${d.duration}" oninput="fset('duration',+this.value)"></label>
+      <label class="f">Jugadores<input value="${esc(d.players)}" placeholder="p.ej. 4, parejas, 2v2" oninput="fset('players',this.value)"></label>
+    </div>
+    <label class="f">Descripción<textarea placeholder="Cómo se organiza, consignas, objetivo..." oninput="fset('description',this.value)">${esc(d.description)}</textarea></label>
+    <label class="f">Material<input value="${esc(d.material)}" placeholder="p.ej. 6 balones, conos, goma" oninput="fset('material',this.value)"></label>
+    <label class="f">Variantes / progresiones<textarea placeholder="Cómo hacerlo más fácil o más difícil" oninput="fset('variants',this.value)">${esc(d.variants)}</textarea></label>
+    <button class="btn primary block" onclick="saveExercise()">${ic('save')} ${form.addTo ? 'Guardar y añadir al entreno' : 'Guardar en la batería'}</button>
+    ${form.id ? `<button class="btn danger block" onclick="deleteExercise('${form.id}')">${ic('trash')} Eliminar de la batería</button>` : ''}`);
+  if (!form.id && !form.data.name) document.getElementById('f-name').focus();
+}
+function saveExercise(){
+  const d = form.data;
+  if (!d.name.trim()) { alert('Ponle un nombre al ejercicio.'); document.getElementById('f-name').focus(); return; }
+  if (form.id) { Object.assign(byId(state.exercises, form.id), d); }
+  else { d.id = uid(); d.createdAt = todayISO(); state.exercises.push(d); }
+  if (form.addTo) addToSession(form.addTo.sessionId, form.addTo.phase, d.id);
+  save(); closeModal(); render();
+}
+function deleteExercise(id){
+  const uses = state.sessions.filter(s => PHASES.some(p => (s.blocks[p.id]||[]).some(i => i.exId === id))).length;
+  if (!confirm(`¿Eliminar este ejercicio de la batería?${uses ? `\nSe quitará también de ${uses} entreno(s).` : ''}`)) return;
+  state.exercises = state.exercises.filter(e => e.id !== id);
+  state.sessions.forEach(s => PHASES.forEach(p => { s.blocks[p.id] = (s.blocks[p.id]||[]).filter(i => i.exId !== id); }));
+  save(); closeModal(); render();
+}
+
+/* ============================ GRUPOS ============================ */
+function renderGrupos(){
+  const slots = state.groups.flatMap(g => g.schedule.map(s => ({ g, s })));
+  return `
+  <h2 style="margin-top:6px"><span class="t">${ic('users')} Mis grupos</span><small>${state.groups.length}</small></h2>
+  ${state.groups.length ? state.groups.map(g => `<div class="card tap" onclick="openGroupForm('${g.id}')">
+      <div class="row between"><div class="title">${esc(g.name)}</div>${levelChip(g.levelId)}</div>
+      <div class="sub">${ic('clock')} ${g.schedule.length ? g.schedule.slice().sort((a,b)=>WEEK_ORDER.indexOf(a.day)-WEEK_ORDER.indexOf(b.day)).map(s => `${DAYS_SHORT[s.day]} ${s.start}–${s.end}`).join(' · ') : 'Sin horario'}</div>
+      ${g.notes ? `<div class="sub">${esc(g.notes)}</div>` : ''}
+    </div>`).join('') : empty('Crea tu primer grupo con su nivel y horario.','users')}
+  <button class="btn primary block" onclick="openGroupForm()">${ic('plus')} Nuevo grupo</button>
+
+  <h2><span class="t">${ic('calendar')} Horario semanal</span></h2>
+  ${slots.length ? WEEK_ORDER.map(d => { const ds = slots.filter(x => x.s.day === d).sort((a,b) => a.s.start.localeCompare(b.s.start)); if (!ds.length) return '';
+      return `<div class="day"><h4>${DAYS[d]}</h4>${ds.map(({g,s}) => `<div class="slot"><span class="time">${s.start}–${s.end}</span><span class="grow">${esc(g.name)}</span>${levelChip(g.levelId, true)}</div>`).join('')}</div>`; }).join('')
+    : empty('Añade horarios a tus grupos para ver aquí la semana.','calendar')}
+
+  <h2><span class="t">${ic('layers')} Niveles</span></h2>
+  <div class="card">
+    ${state.levels.map(l => `<div class="row" style="padding:8px 0;border-bottom:1px solid var(--line)"><span class="dot" style="background:${l.color}"></span><span class="grow" style="font-weight:600">${esc(l.name)}</span><small>${state.groups.filter(g=>g.levelId===l.id).length} grupos · ${state.exercises.filter(e=>e.levelIds.includes(l.id)).length} ej.</small><button class="icon-btn" onclick="openLevelForm('${l.id}')">${ic('edit')}</button></div>`).join('')}
+    <button class="btn small block" onclick="openLevelForm()">${ic('plus')} Añadir nivel</button>
+  </div>`;
+}
+let gform = null;
+function openGroupForm(id){
+  const g = id ? byId(state.groups, id) : null;
+  gform = { id, data: g ? JSON.parse(JSON.stringify(g)) : { name:'', levelId: state.levels[0]?.id || '', schedule:[{ day:1, start:'18:00', end:'19:30' }], notes:'' } };
+  renderGroupForm();
+}
+function gset(k, v){ gform.data[k] = v; }
+function gsched(i, k, v){ gform.data.schedule[i][k] = k === 'day' ? +v : v; }
+function gAddSlot(){ const last = gform.data.schedule.at(-1); gform.data.schedule.push({ day: last ? (last.day + 2) % 7 : 1, start: last?.start || '18:00', end: last?.end || '19:30' }); renderGroupForm(); }
+function gDelSlot(i){ gform.data.schedule.splice(i,1); renderGroupForm(); }
+function renderGroupForm(){
+  const d = gform.data;
+  openModal(`${sheetHead(gform.id ? `${ic('edit')} Editar grupo` : `${ic('plus')} Nuevo grupo`)}
+    <label class="f">Nombre del grupo<input id="g-name" value="${esc(d.name)}" placeholder="p.ej. Adultos martes / Sub-18" oninput="gset('name',this.value)"></label>
+    <label class="f">Nivel<select onchange="gset('levelId',this.value)">${state.levels.map(l => `<option value="${l.id}" ${l.id===d.levelId?'selected':''}>${esc(l.name)}</option>`).join('')}</select></label>
+    <label class="f">Horario</label>
+    ${d.schedule.map((s, i) => `<div class="sched-row">
+      <select onchange="gsched(${i},'day',this.value)">${WEEK_ORDER.map(x => `<option value="${x}" ${x===s.day?'selected':''}>${DAYS[x]}</option>`).join('')}</select>
+      <input type="time" value="${s.start}" onchange="gsched(${i},'start',this.value)">
+      <input type="time" value="${s.end}" onchange="gsched(${i},'end',this.value)">
+      <button class="icon-btn del" onclick="gDelSlot(${i})">${ic('x')}</button>
+    </div>`).join('')}
+    <button class="btn small" style="margin-bottom:14px" onclick="gAddSlot()">${ic('plus')} Añadir día</button>
+    <label class="f">Notas<textarea placeholder="Jugadores, objetivos de la temporada..." oninput="gset('notes',this.value)">${esc(d.notes)}</textarea></label>
+    <button class="btn primary block" onclick="saveGroup()">${ic('save')} Guardar grupo</button>
+    ${gform.id ? `<button class="btn danger block" onclick="deleteGroup('${gform.id}')">${ic('trash')} Eliminar grupo</button>` : ''}`);
+  if (!gform.id && !d.name) document.getElementById('g-name').focus();
+}
+function saveGroup(){
+  const d = gform.data; if (!d.name.trim()) { alert('Ponle un nombre al grupo.'); return; }
+  if (gform.id) Object.assign(byId(state.groups, gform.id), d); else { d.id = uid(); state.groups.push(d); }
+  save(); closeModal(); render();
+}
+function deleteGroup(id){
+  const n = state.sessions.filter(s => s.groupId === id).length;
+  if (!confirm(`¿Eliminar este grupo?${n ? `\n${n} entreno(s) quedarán sin grupo.` : ''}`)) return;
+  state.groups = state.groups.filter(g => g.id !== id); state.sessions.forEach(s => { if (s.groupId === id) s.groupId = ''; });
+  save(); closeModal(); render();
+}
+let lform = null;
+function openLevelForm(id){
+  const l = id ? byId(state.levels, id) : null;
+  lform = { id, data: l ? { ...l } : { name:'', color: COLORS[state.levels.length % COLORS.length] } };
+  renderLevelForm();
+}
+function renderLevelForm(){
+  const d = lform.data;
+  openModal(`${sheetHead(lform.id ? `${ic('edit')} Editar nivel` : `${ic('plus')} Nuevo nivel`)}
+    <label class="f">Nombre<input value="${esc(d.name)}" placeholder="p.ej. Iniciación" oninput="lform.data.name=this.value"></label>
+    <label class="f">Color<div class="colors">${COLORS.map(c => `<button class="${c===d.color?'on':''}" style="background:${c}" onclick="lform.data.color='${c}';renderLevelForm()"></button>`).join('')}</div></label>
+    <button class="btn primary block" onclick="saveLevel()">${ic('save')} Guardar</button>
+    ${lform.id && state.levels.length > 1 ? `<button class="btn danger block" onclick="deleteLevel('${lform.id}')">${ic('trash')} Eliminar nivel</button>` : ''}`);
+}
+function saveLevel(){
+  const d = lform.data; if (!d.name.trim()) { alert('Ponle un nombre al nivel.'); return; }
+  if (lform.id) Object.assign(byId(state.levels, lform.id), d); else { d.id = uid(); state.levels.push(d); }
+  save(); closeModal(); render();
+}
+function deleteLevel(id){
+  if (!confirm('¿Eliminar este nivel? Los grupos pasarán al primer nivel y los ejercicios perderán esta etiqueta.')) return;
+  state.levels = state.levels.filter(l => l.id !== id);
+  state.groups.forEach(g => { if (g.levelId === id) g.levelId = state.levels[0].id; });
+  state.exercises.forEach(e => { e.levelIds = e.levelIds.filter(x => x !== id); });
+  save(); closeModal(); render();
+}
+
+/* ============================ AJUSTES ============================ */
+function renderAjustes(){
+  const canShare = !!(navigator.share && navigator.canShare);
+  const standalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+  return `
+  <h2 style="margin-top:6px"><span class="t">${ic('database')} Copia de seguridad</span></h2>
+  <div class="card">
+    <p class="hint" style="margin-top:0">Los datos se guardan solo en este dispositivo. Exporta una copia de vez en cuando (y para pasar la batería a otro móvil).</p>
+    <div class="row">
+      <button class="btn primary grow" onclick="exportData()">${ic('download')} Exportar</button>
+      ${canShare ? `<button class="btn grow" onclick="shareData()">${ic('share')} Compartir</button>` : ''}
+    </div>
+    <label class="btn block" style="cursor:pointer">${ic('upload')} Importar copia<input type="file" accept="application/json,.json" style="display:none" onchange="importData(this)"></label>
+  </div>
+
+  <h2><span class="t">${ic('phone')} Tenerla en el móvil</span></h2>
+  <div class="card hint">
+    ${standalone ? `<b style="color:var(--ok)">${ic('check')} Ya estás usando la app instalada.</b><br><br>` : ''}
+    <b>iPhone (Safari):</b>
+    <ol><li>Abre la dirección de la app en Safari.</li><li>Botón <b>Compartir</b> (cuadrado con flecha) → <b>Añadir a pantalla de inicio</b>.</li></ol>
+    <b>Android (Chrome):</b>
+    <ol><li>Abre la dirección de la app en Chrome.</li><li>Menú ⋮ → <b>Instalar app</b> / <b>Añadir a la pantalla de inicio</b>.</li></ol>
+    Una vez instalada funciona sin conexión. Los datos se quedan en el móvil; usa <b>Exportar</b> para no perderlos si borras el navegador.
+  </div>
+
+  <h2><span class="t">${ic('info')} Datos</span></h2>
+  <div class="card">
+    <div class="sub">${state.levels.length} niveles · ${state.groups.length} grupos · ${state.exercises.length} ejercicios · ${state.sessions.length} entrenos · ${TECH_CATS.length} gestos técnicos con ${Object.values(TECH_TREE).reduce((a,x)=>a+x.length,0)} subtipos</div>
+    <button class="btn danger block" onclick="resetData()">${ic('trash')} Borrar todos los datos</button>
+  </div>
+  <p class="hint" style="text-align:center">Beach Coach · planificador de entrenos de vóley playa</p>`;
+}
+function exportData(){
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type:'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `beachcoach-${todayISO()}.json`; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+}
+async function shareData(){
+  const file = new File([JSON.stringify(state, null, 2)], `beachcoach-${todayISO()}.json`, { type:'application/json' });
+  if (navigator.canShare && navigator.canShare({ files:[file] })) { try { await navigator.share({ files:[file], title:'Beach Coach · copia' }); } catch(e){} }
+  else exportData();
+}
+function importData(input){
+  const f = input.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try {
+      const d = JSON.parse(r.result);
+      if (!d.levels || !d.exercises || !d.sessions) throw new Error('formato');
+      if (!confirm(`Importar ${d.exercises.length} ejercicios, ${d.groups?.length||0} grupos y ${d.sessions.length} entrenos.\nEsto REEMPLAZA los datos actuales. ¿Continuar?`)) return;
+      state = migrate(Object.assign(defaultState(), d)); save(); render(); alert('Datos importados correctamente.');
+    } catch(e) { alert('El archivo no es una copia válida de Beach Coach.'); }
+  };
+  r.readAsText(f); input.value = '';
+}
+function resetData(){
+  if (!confirm('¿Borrar TODOS los datos? Esta acción no se puede deshacer.')) return;
+  if (!confirm('¿Seguro? Te recomendamos exportar antes una copia.')) return;
+  state = defaultState(); save(); go('hoy');
+}
+
+/* ============================ INIT ============================ */
+render();
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>
