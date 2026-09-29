@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#0284c7">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Beach Coach">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -218,7 +218,7 @@ label.f input:focus,label.f select:focus,label.f textarea:focus{outline:none;bor
 
 <script>
 // Sube este número cada vez que cambies la app (y el VERSION de sw.js) para saber qué versión tienes en el móvil.
-const APP_VERSION = '6';
+const APP_VERSION = '8';
 
 /* ============================ ICONOS (SVG propios) ============================ */
 const ICONS = {
@@ -355,6 +355,7 @@ function render(){
   tabs.innerHTML = TABS.map(t => `<button class="${TAB_OF[route.view]===t.id?'active':''}" onclick="go('${t.id}')">${ic(t.icon)}${t.label}</button>`).join('');
   tabs.style.display = route.view === 'run' ? 'none' : '';
   document.body.classList.toggle('run-mode', route.view === 'run');
+  const tc = document.querySelector('meta[name="theme-color"]'); if (tc) tc.content = route.view === 'run' ? '#0f172a' : '#0284c7';
 }
 
 /* ============================ HELPERS UI ============================ */
