@@ -21,7 +21,10 @@
   --tabs-pb:max(6px, calc(env(safe-area-inset-bottom) - 12px));
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif;font-size:16px;line-height:1.4}
+html,body{margin:0;padding:0;background:#fff;color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif;font-size:16px;line-height:1.4}
+/* El fondo raíz es blanco (color de la barra inferior): en iOS PWA el viewport puede quedar más corto que la
+   pantalla y la franja sobrante se pinta con este color, así queda integrada en la barra y no se ve un hueco. */
+body.run-mode{background:#0f172a}
 /* Layout fijo: el body no hace scroll, lo hace #app. Evita que la barra inferior "flote" en iOS.
    No usar position:fixed en html/body: en iOS (PWA) desplaza el viewport y deja un hueco bajo la barra. */
 html,body{height:100%;width:100%;overflow:hidden;overscroll-behavior:none}
@@ -36,7 +39,7 @@ h2{font-size:1.05rem;font-weight:700;margin:22px 4px 10px;display:flex;align-ite
 h2 .t{display:inline-flex;align-items:center;gap:6px}
 h2 small{font-weight:500;color:var(--muted);font-size:.8rem}
 small{color:var(--muted)}
-#app{position:fixed;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:calc(12px + env(safe-area-inset-top)) 14px calc(96px + env(safe-area-inset-bottom))}
+#app{position:fixed;inset:0;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:calc(12px + env(safe-area-inset-top)) 14px calc(96px + env(safe-area-inset-bottom))}
 #app>*{max-width:640px;margin-left:auto;margin-right:auto}
 body.run-mode #app{background:#0f172a;padding-bottom:0}
 
@@ -218,7 +221,7 @@ label.f input:focus,label.f select:focus,label.f textarea:focus{outline:none;bor
 
 <script>
 // Sube este número cada vez que cambies la app (y el VERSION de sw.js) para saber qué versión tienes en el móvil.
-const APP_VERSION = '8';
+const APP_VERSION = '9';
 
 /* ============================ ICONOS (SVG propios) ============================ */
 const ICONS = {
