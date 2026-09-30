@@ -211,6 +211,8 @@ label.f input:focus,label.f select:focus,label.f textarea:focus{outline:none;bor
 .board-tools .sw{width:28px;height:28px;border-radius:50%;border:3px solid transparent;flex:none}
 .board-tools .sw.on{border-color:#fff}
 .board-tools .sep{width:1px;height:28px;background:#475569;margin:0 4px}
+.board-tools .tb.sm{min-width:0;height:32px;padding:0 10px;font-size:.75rem;border-radius:10px;background:#0f172a;border:1px solid #475569}
+.board-tools .tb.sm.on{background:#0284c7;border-color:#0284c7}
 
 /* Mocho: marcador */
 .mocho{position:fixed;inset:0;background:#0f172a;z-index:60;display:flex;flex-direction:column;color:#e2e8f0;padding:env(safe-area-inset-top) 0 calc(12px + env(safe-area-inset-bottom));overflow-y:auto;-webkit-overflow-scrolling:touch}
@@ -287,7 +289,7 @@ label.f input:focus,label.f select:focus,label.f textarea:focus{outline:none;bor
 
 <script>
 // Sube este número cada vez que cambies la app (y el VERSION de sw.js) para saber qué versión tienes en el móvil.
-const APP_VERSION = '14';
+const APP_VERSION = '15';
 
 /* ============================ ICONOS (SVG propios) ============================ */
 const ICONS = {
@@ -334,6 +336,8 @@ const ICONS = {
   sparkle:  '<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2 2M16 16l2 2M6 18l2-2M16 8l2-2"/>',
   board:    '<rect x="4" y="2" width="16" height="20" rx="2"/><path d="M4 12h16M8 7h8M8 17h8"/>',
   arrow:    '<path d="M5 19 19 5M9 5h10v10"/>',
+  zone:     '<rect x="4" y="6" width="16" height="12" rx="2" stroke-dasharray="3 2"/><path d="M8 10h8M8 14h5" opacity=".5"/>',
+  grid:     '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/>',
   eraser:   '<path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"/><path d="M22 21H7M5 11l9 9"/>',
   undo:     '<path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-15-6.7L3 13"/>',
   trophy:   '<path d="M8 21h8M12 17v4M6 3h12v6a6 6 0 0 1-12 0z"/><path d="M6 5H3v2a4 4 0 0 0 4 4M18 5h3v2a4 4 0 0 1-4 4"/>',
@@ -989,9 +993,10 @@ function renderMocho(){
 /* ============================ PIZARRA ============================ */
 let board = null;
 const BOARD_COLORS = ['#facc15','#ffffff','#38bdf8','#f97316','#4ade80','#1e293b'];
-const TOKEN_KINDS = { A:{ fill:'#2563eb', label:'A' }, B:{ fill:'#ea580c', label:'B' }, E:{ fill:'#16a34a', label:'E' }, ball:{}, cone:{} };
+const TOKEN_KINDS = { A:{ fill:'#2563eb', label:'A' }, B:{ fill:'#ea580c', label:'B' }, ball:{}, cone:{}, hoop:{}, x:{}, text:{} };
+const BOARD_LABELS = ['corta','medio','línea','diago','diago corta','larga','2','4'];
 function boardDefault(){
-  return { tool:'pen', color:BOARD_COLORS[0], horiz:false, strokes:[], cur:null, drag:null, tokens:[
+  return { tool:'pen', color:BOARD_COLORS[0], horiz:false, zones:false, strokes:[], cur:null, drag:null, tokens:[
     { id:uid(), kind:'A', n:1, u:.36, v:.30 }, { id:uid(), kind:'A', n:2, u:.64, v:.38 },
     { id:uid(), kind:'B', n:1, u:.36, v:.70 }, { id:uid(), kind:'B', n:2, u:.64, v:.62 },
     { id:uid(), kind:'ball', u:.5, v:.5 },
@@ -1024,12 +1029,16 @@ function boardSet(k, v){ board[k] = v; renderBoardTools(); }
 function boardUndo(){ board.strokes.pop(); boardDraw(); }
 function boardClear(){ board.strokes = []; boardDraw(); }
 function boardReset(){ const { tool, color } = board; board = Object.assign(boardDefault(), { tool, color }); boardResize(); renderBoardTools(); }
-function boardAdd(kind){
+function boardAdd(kind, text){
   const n = board.tokens.filter(t => t.kind === kind).length + 1;
-  board.tokens.push({ id:uid(), kind, n, u:.5, v: kind === 'B' ? .8 : .2 }); boardDraw();
+  // Reparte las fichas nuevas en la zona libre para que no se solapen
+  const u = .12 + ((n - 1) % 7) * .125, v = kind === 'B' ? .93 : kind === 'A' ? .07 : (.5 + (n % 2 ? .43 : -.43));
+  board.tokens.push({ id:uid(), kind, n, u, v, text, color: board.color }); boardDraw();
 }
+function boardLabel(){ const t = prompt('Texto de la etiqueta', ''); if (t && t.trim()) boardAdd('text', t.trim().slice(0, 18)); }
+function boardToggleZones(){ board.zones = !board.zones; renderBoardTools(); boardDraw(); }
 function renderBoardTools(){
-  const tools = [['pen','edit','Lápiz'],['arrow','arrow','Flecha'],['erase','eraser','Borrar']];
+  const tools = [['pen','edit','Lápiz'],['arrow','arrow','Flecha'],['zone','zone','Zona'],['erase','eraser','Borrar']];
   document.getElementById('board-tools').innerHTML = `
     <div class="trow">
       ${tools.map(([id,icn,lb]) => `<button class="tb ${board.tool===id?'on':''}" onclick="boardSet('tool','${id}')">${ic(icn)} ${lb}</button>`).join('')}
@@ -1037,14 +1046,20 @@ function renderBoardTools(){
       ${BOARD_COLORS.map(c => `<button class="sw ${board.color===c?'on':''}" style="background:${c}" onclick="boardSet('color','${c}')"></button>`).join('')}
     </div>
     <div class="trow">
-      <small style="color:#94a3b8;font-weight:700">Añadir:</small>
       <button class="tb tok" style="background:${TOKEN_KINDS.A.fill};color:#fff" onclick="boardAdd('A')">A</button>
       <button class="tb tok" style="background:${TOKEN_KINDS.B.fill};color:#fff" onclick="boardAdd('B')">B</button>
-      <button class="tb tok" style="background:${TOKEN_KINDS.E.fill};color:#fff" onclick="boardAdd('E')">E</button>
       <button class="tb tok" style="background:#fde047;color:#713f12" onclick="boardAdd('ball')">${ic('ball')}</button>
       <button class="tb tok" style="background:#fed7aa;color:#c2410c" onclick="boardAdd('cone')">▲</button>
-      <small style="color:#64748b;margin-left:6px">Arrastra las fichas · con <b>Borrar</b> las quitas</small>
-    </div>`;
+      <button class="tb tok" style="background:#fecaca;color:#dc2626;font-size:1.3rem" title="Aro" onclick="boardAdd('hoop')">◯</button>
+      <button class="tb tok" style="background:#1e293b;color:#f87171;font-size:1.2rem" title="Objetivo" onclick="boardAdd('x')">✕</button>
+      <span class="sep"></span>
+      <button class="tb ${board.zones?'on':''}" title="Numeración 1-6" onclick="boardToggleZones()">${ic('grid')} 1-6</button>
+    </div>
+    <div class="trow">
+      ${BOARD_LABELS.map(l => `<button class="tb sm" onclick="boardAdd('text','${l}')">${l}</button>`).join('')}
+      <button class="tb sm" onclick="boardLabel()">${ic('plus')} texto</button>
+    </div>
+    <div class="trow" style="padding-top:0"><small style="color:#64748b">Arrastra fichas y etiquetas · <b>Zona</b>: arrastra para sombrear un área · con <b>Borrar</b> quitas cualquier cosa</small></div>`;
 }
 function boardResize(){
   const cv = document.getElementById('board-cv'); if (!cv) return;
@@ -1075,6 +1090,17 @@ function boardDraw(){
   // Red y postes
   ctx.strokeStyle = '#1e293b'; ctx.lineWidth = 4; ctx.setLineDash([7, 4]); line(P(2.5/14, .5), P(11.5/14, .5)); ctx.setLineDash([]);
   ctx.fillStyle = '#1e293b'; [P(2.5/14, .5), P(11.5/14, .5)].forEach(([x,y]) => { ctx.beginPath(); ctx.arc(x, y, 5, 0, Math.PI*2); ctx.fill(); });
+  // Numeración de zonas 1-6 (cada equipo mirando a la red)
+  if (board.zones) {
+    ctx.strokeStyle = 'rgba(30,41,59,.28)'; ctx.lineWidth = 1.5; ctx.setLineDash([5, 5]);
+    [7/22, 15/22].forEach(v => line(P(3/14, v), P(11/14, v)));
+    [17/42, 25/42].forEach(u => line(P(u, 3/22), P(u, 19/22)));
+    ctx.setLineDash([]);
+    ctx.fillStyle = 'rgba(30,41,59,.35)'; ctx.font = `800 ${Math.round(R*1.6)}px -apple-system,Segoe UI,Roboto,sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    const cols = [13/42, 21/42, 29/42];
+    const rows = [[5/22, [1,6,5]], [9/22, [2,3,4]], [13/22, [4,3,2]], [17/22, [5,6,1]]];
+    rows.forEach(([v, nums]) => nums.forEach((n, i) => { const [x,y] = P(cols[i], v); ctx.fillText(n, x, y); }));
+  }
   // Dibujos
   board.strokes.forEach(s => drawStroke(ctx, s, P));
   if (board.cur) drawStroke(ctx, board.cur, P);
@@ -1086,6 +1112,11 @@ function drawStroke(ctx, s, P){
   ctx.strokeStyle = s.color; ctx.fillStyle = s.color; ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
   if (s.type === 'pen') {
     ctx.beginPath(); s.pts.forEach((p, i) => { const [x,y] = P(p[0], p[1]); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }); ctx.stroke();
+  } else if (s.type === 'zone') {
+    const [x0,y0] = P(...s.pts[0]), [x1,y1] = P(...s.pts[s.pts.length-1]);
+    const x = Math.min(x0,x1), y = Math.min(y0,y1), w = Math.abs(x1-x0), h = Math.abs(y1-y0); if (w < 4 && h < 4) return;
+    ctx.globalAlpha = .32; ctx.fillRect(x, y, w, h); ctx.globalAlpha = 1;
+    ctx.lineWidth = 2.5; ctx.setLineDash([6, 4]); ctx.strokeRect(x, y, w, h); ctx.setLineDash([]);
   } else {
     const [x0,y0] = P(...s.pts[0]), [x1,y1] = P(...s.pts[s.pts.length-1]);
     const dx = x1-x0, dy = y1-y0, len = Math.hypot(dx, dy); if (len < 6) return;
@@ -1103,6 +1134,25 @@ function drawToken(ctx, t, P, R){
     ctx.beginPath(); ctx.moveTo(x, y - R*.8); ctx.lineTo(x + R*.7, y + R*.6); ctx.lineTo(x - R*.7, y + R*.6); ctx.closePath(); ctx.fill(); ctx.stroke();
     return;
   }
+  if (t.kind === 'hoop') {
+    ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(x, y, R*.85, 0, Math.PI*2); ctx.stroke();
+    ctx.strokeStyle = 'rgba(255,255,255,.7)'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(x, y, R*.85, 0, Math.PI*2); ctx.stroke();
+    return;
+  }
+  if (t.kind === 'x') {
+    const r = R * .6; ctx.lineCap = 'round';
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 7; ctx.beginPath(); ctx.moveTo(x-r, y-r); ctx.lineTo(x+r, y+r); ctx.moveTo(x+r, y-r); ctx.lineTo(x-r, y+r); ctx.stroke();
+    ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(x-r, y-r); ctx.lineTo(x+r, y+r); ctx.moveTo(x+r, y-r); ctx.lineTo(x-r, y+r); ctx.stroke();
+    return;
+  }
+  if (t.kind === 'text') {
+    ctx.font = `800 ${Math.round(R*.8)}px -apple-system,Segoe UI,Roboto,sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    const tw = ctx.measureText(t.text || '').width + R*.9, th = R*1.3; t.w = tw; t.h = th;
+    ctx.fillStyle = 'rgba(15,23,42,.88)'; ctx.strokeStyle = t.color || '#facc15'; ctx.lineWidth = 2;
+    ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(x - tw/2, y - th/2, tw, th, th/2); else ctx.rect(x - tw/2, y - th/2, tw, th); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#fff'; ctx.fillText(t.text || '', x, y + 1);
+    return;
+  }
   if (t.kind === 'ball') {
     const r = R * .7;
     ctx.fillStyle = '#fde047'; ctx.strokeStyle = '#ca8a04'; ctx.lineWidth = 2;
@@ -1115,7 +1165,7 @@ function drawToken(ctx, t, P, R){
   ctx.fillStyle = k.fill; ctx.strokeStyle = '#fff'; ctx.lineWidth = 2.5;
   ctx.beginPath(); ctx.arc(x, y, R, 0, Math.PI*2); ctx.fill(); ctx.stroke();
   ctx.fillStyle = '#fff'; ctx.font = `800 ${Math.round(R*.95)}px -apple-system,Segoe UI,Roboto,sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillText(`${k.label}${t.kind === 'E' ? '' : t.n}`, x, y + 1);
+  ctx.fillText(`${k.label}${t.n}`, x, y + 1);
 }
 function boardPos(e){
   const cv = e.currentTarget; const r = cv.getBoundingClientRect(); const { UV, P, R } = boardGeom(cv);
@@ -1123,12 +1173,19 @@ function boardPos(e){
   return { x, y, uv: UV(x, y), UV, P, R };
 }
 function boardHit(x, y, P, R){
-  for (let i = board.tokens.length - 1; i >= 0; i--) { const [tx,ty] = P(board.tokens[i].u, board.tokens[i].v); if (Math.hypot(tx-x, ty-y) <= R + 4) return board.tokens[i]; }
+  for (let i = board.tokens.length - 1; i >= 0; i--) {
+    const t = board.tokens[i]; const [tx,ty] = P(t.u, t.v);
+    if (t.kind === 'text') { if (Math.abs(tx-x) <= (t.w||R*2)/2 + 4 && Math.abs(ty-y) <= (t.h||R)/2 + 4) return t; }
+    else if (Math.hypot(tx-x, ty-y) <= R + 4) return t;
+  }
   return null;
 }
 function boardErase(x, y, P, R){
   const hit = boardHit(x, y, P, R); if (hit) { board.tokens = board.tokens.filter(t => t !== hit); return; }
-  board.strokes = board.strokes.filter(s => !s.pts.some(p => { const [px,py] = P(p[0], p[1]); return Math.hypot(px-x, py-y) < 14; }));
+  board.strokes = board.strokes.filter(s => {
+    if (s.type === 'zone') { const [x0,y0] = P(...s.pts[0]), [x1,y1] = P(...s.pts[s.pts.length-1]); return !(x >= Math.min(x0,x1) && x <= Math.max(x0,x1) && y >= Math.min(y0,y1) && y <= Math.max(y0,y1)); }
+    return !s.pts.some(p => { const [px,py] = P(p[0], p[1]); return Math.hypot(px-x, py-y) < 14; });
+  });
 }
 function boardDown(e){
   if (board.drag || board.cur) return;
