@@ -184,8 +184,10 @@ label.f input:focus,label.f select:focus,label.f textarea:focus{outline:none;bor
 .run .ritem.now{background:#263247;box-shadow:0 0 0 2px var(--c)}
 .run .ritem.now.done{opacity:.7}
 .run .notes{background:#1e293b;border-radius:14px;padding:12px 14px;white-space:pre-wrap;color:#cbd5e1}
-/* Reloj fijo arriba en modo entreno */
-.run .rclock{position:sticky;top:env(safe-area-inset-top);z-index:5;background:#0f172a;box-shadow:0 -14px 0 #0f172a;padding:2px 0 8px;margin-bottom:8px;border-bottom:1px solid #1e293b}
+/* Reloj fijo arriba en modo entreno (barra fija; el relleno superior de .run se ajusta por JS a su altura) */
+.run{padding-top:calc(118px + env(safe-area-inset-top))}
+.run .rclock{position:fixed;top:0;left:0;right:0;max-width:none;z-index:35;background:#0f172a;padding:calc(6px + env(safe-area-inset-top)) 14px 8px;border-bottom:1px solid #1e293b}
+.run .rclock .inner{max-width:640px;margin:0 auto}
 .run .rclock .big{font-size:3.2rem;font-weight:800;color:#fff;letter-spacing:.02em;font-variant-numeric:tabular-nums;line-height:1}
 .run .rclock .meta{text-align:center;color:#94a3b8;font-size:.85rem;margin-top:6px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:5px;cursor:pointer}
 .run .rclock .meta.late{color:#f87171}
@@ -199,7 +201,7 @@ label.f input:focus,label.f select:focus,label.f textarea:focus{outline:none;bor
 .board-top .back{color:#7dd3fc}
 .board-top .ttl{font-weight:800;display:inline-flex;align-items:center;gap:6px}
 .board-wrap{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:4px}
-.board-wrap canvas{touch-action:none;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,.45);display:block}
+.board-wrap canvas{touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,.45);display:block}
 .board-tools{background:#1e293b;padding:6px 8px calc(8px + env(safe-area-inset-bottom))}
 .board-tools .trow{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;padding:3px 0}
 .board-tools .tb{min-width:42px;height:42px;padding:0 10px;border-radius:12px;background:#334155;color:#e2e8f0;display:inline-flex;align-items:center;justify-content:center;gap:4px;font-weight:800;font-size:.8rem}
@@ -285,7 +287,7 @@ label.f input:focus,label.f select:focus,label.f textarea:focus{outline:none;bor
 
 <script>
 // Sube este número cada vez que cambies la app (y el VERSION de sw.js) para saber qué versión tienes en el móvil.
-const APP_VERSION = '13';
+const APP_VERSION = '14';
 
 /* ============================ ICONOS (SVG propios) ============================ */
 const ICONS = {
@@ -441,8 +443,10 @@ function render(){
   tabs.style.display = route.view === 'run' ? 'none' : '';
   document.body.classList.toggle('run-mode', route.view === 'run');
   const tc = document.querySelector('meta[name="theme-color"]'); if (tc) tc.content = route.view === 'run' ? '#0f172a' : '#0284c7';
-  if (route.view === 'run') tickClock();
+  if (route.view === 'run') { tickClock(); fitRunHead(); }
 }
+function fitRunHead(){ const h = document.querySelector('.run .rclock'), run = document.querySelector('.run'); if (h && run) run.style.paddingTop = (h.offsetHeight + 10) + 'px'; }
+window.addEventListener('resize', fitRunHead);
 
 /* ============================ HELPERS UI ============================ */
 function levelChips(ids, small){
@@ -815,6 +819,7 @@ function tickClock(){
   if (slot && slot.end && toMin(slot.end) < end) txt += ` · horario hasta ${slot.end}`;
   meta.className = 'meta ' + cls; meta.innerHTML = `${txt} ${ic('edit')}`;
   document.querySelectorAll('.ritem[data-s]').forEach(r => r.classList.toggle('now', now >= +r.dataset.s && now < +r.dataset.e));
+  fitRunHead();
 }
 setInterval(tickClock, 1000);
 function renderRun(){
@@ -822,14 +827,14 @@ function renderRun(){
   const g = byId(state.groups, s.groupId);
   const start = runStart(s); let t = start ? toMin(start) : null;
   return `<div class="run">
-    <div class="rclock">
+    <div class="rclock"><div class="inner">
       <div class="row between">
         <button class="back" onclick="go('session',{id:'${s.id}'})">${ic('left')} Salir</button>
         <div class="big" id="rc-time">${fromMin(nowMin())}</div>
         <button class="btn small" onclick="openBoard()">${ic('board')} Pizarra</button>
       </div>
       <div class="meta" id="rc-meta" onclick="setRunStart('${s.id}')"></div>
-    </div>
+    </div></div>
     <div class="rhead">
       <div style="color:#7dd3fc;font-weight:700;font-size:.85rem">${fmtDate(s.date)} · ${esc(groupName(s.groupId))}${g ? ` · ${esc(level(g.levelId)?.name||'')}` : ''} · ${sessionTotal(s)} min</div>
       <h1>${esc(sessionTitle(s))}</h1>
@@ -1115,7 +1120,7 @@ function drawToken(ctx, t, P, R){
 function boardPos(e){
   const cv = e.currentTarget; const r = cv.getBoundingClientRect(); const { UV, P, R } = boardGeom(cv);
   const x = e.clientX - r.left, y = e.clientY - r.top;
-  return { x, y, uv: UV(x, y), P, R };
+  return { x, y, uv: UV(x, y), UV, P, R };
 }
 function boardHit(x, y, P, R){
   for (let i = board.tokens.length - 1; i >= 0; i--) { const [tx,ty] = P(board.tokens[i].u, board.tokens[i].v); if (Math.hypot(tx-x, ty-y) <= R + 4) return board.tokens[i]; }
