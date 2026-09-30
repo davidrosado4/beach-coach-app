@@ -289,7 +289,7 @@ label.f input:focus,label.f select:focus,label.f textarea:focus{outline:none;bor
 
 <script>
 // Sube este número cada vez que cambies la app (y el VERSION de sw.js) para saber qué versión tienes en el móvil.
-const APP_VERSION = '15';
+const APP_VERSION = '16';
 
 /* ============================ ICONOS (SVG propios) ============================ */
 const ICONS = {
@@ -336,6 +336,7 @@ const ICONS = {
   sparkle:  '<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2 2M16 16l2 2M6 18l2-2M16 8l2-2"/>',
   board:    '<rect x="4" y="2" width="16" height="20" rx="2"/><path d="M4 12h16M8 7h8M8 17h8"/>',
   arrow:    '<path d="M5 19 19 5M9 5h10v10"/>',
+  move:     '<path d="M12 2v20M2 12h20M12 2l-3 3M12 2l3 3M12 22l-3-3M12 22l3-3M2 12l3-3M2 12l3 3M22 12l-3-3M22 12l-3 3"/>',
   zone:     '<rect x="4" y="6" width="16" height="12" rx="2" stroke-dasharray="3 2"/><path d="M8 10h8M8 14h5" opacity=".5"/>',
   grid:     '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/>',
   eraser:   '<path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"/><path d="M22 21H7M5 11l9 9"/>',
@@ -382,7 +383,7 @@ const COLORS = ['#22c55e','#3b82f6','#f59e0b','#ef4444','#a855f7','#ec4899','#14
 /* Mocho: juego final del entreno */
 const MOCHO_COLOR = '#e11d48';
 const MOCHO_MODES = [
-  { id:'king',  name:'King',          desc:'Rey de la pista: la pareja que gana el punto se queda como rey y la que pierde sale. Solo puntúa el rey al ganar el punto.' },
+  { id:'king',  name:'King / Queen',  desc:'Rey o reina de la pista: la pareja que gana el punto se queda con la corona y la que pierde sale. Solo puntúa quien tiene la corona al ganar el punto.' },
   { id:'p21',   name:'Partido a 21',  desc:'Un partido 2v2 a 21 puntos con diferencia de dos. Cambio de campo cada 7 puntos.' },
   { id:'best3', name:'Mejor de 3',    desc:'Mini-partidos al mejor de 3 (gana quien llega a 2). Van entrando parejas y se cuentan los partidos ganados.' },
   { id:'p3',    name:'A 3 (máx. 5)',  desc:'Mini-partidos a 3 puntos con diferencia de dos, máximo 5. Van entrando parejas y se cuentan los partidos ganados.' },
@@ -951,10 +952,10 @@ function renderMocho(){
   const isKing = L.mode === 'king', rot = L.mode === 'best3' || L.mode === 'p3';
   const A = L.pairs[L.court[0]], B = L.pairs[L.court[1]];
   const panel = (side, P, cls) => `<div class="side-p ${cls} ${L.ended===side?'won':''}" onclick="mochoPoint(${side})">
-      <div class="lb top">${isKing ? (side===0 ? `${ic('crown')} Rey` : 'Retador') : (side===0 ? 'Lado A' : 'Lado B')}</div>
+      <div class="lb top">${isKing ? (side===0 ? `${ic('crown')} King / Queen` : 'Retador') : (side===0 ? 'Lado A' : 'Lado B')}</div>
       <div class="nm">${esc(P.name)}</div>
       <div class="sc">${isKing ? P.pts : (side===0 ? L.a : L.b)}</div>
-      <div class="lb">${isKing ? (side===0 ? 'toca si gana el rey' : 'toca si gana el retador') : (rot ? `${P.wins} ganado${P.wins===1?'':'s'}` : `${P.wins} partido${P.wins===1?'':'s'}`)}</div>
+      <div class="lb">${isKing ? (side===0 ? 'toca si gana la corona' : 'toca si gana el retador') : (rot ? `${P.wins} ganado${P.wins===1?'':'s'}` : `${P.wins} partido${P.wins===1?'':'s'}`)}</div>
     </div>`;
   const total = L.a + L.b;
   let banner = '';
@@ -968,7 +969,7 @@ function renderMocho(){
       <h4><span>Clasificación</span><span>${isKing ? 'puntos' : `partidos · ${L.games} jugados`}</span></h4>
       ${rows.map(({ p, i }) => `<div class="tr ${L.court.includes(i)?'on':''}" onclick="mochoRename(${i})">
         <b>${esc(p.name)}</b>
-        <span class="q">${L.court.includes(i) ? (isKing && L.court[0] === i ? 'rey' : 'en pista') : (L.queue.indexOf(i) === 0 ? 'siguiente' : `${L.queue.indexOf(i)+1}º en espera`)}</span>
+        <span class="q">${L.court.includes(i) ? (isKing && L.court[0] === i ? 'corona' : 'en pista') : (L.queue.indexOf(i) === 0 ? 'siguiente' : `${L.queue.indexOf(i)+1}º en espera`)}</span>
         <span class="n">${isKing ? p.pts : p.wins}</span>
       </div>`).join('')}
     </div>` : '';
@@ -996,7 +997,7 @@ const BOARD_COLORS = ['#facc15','#ffffff','#38bdf8','#f97316','#4ade80','#1e293b
 const TOKEN_KINDS = { A:{ fill:'#2563eb', label:'A' }, B:{ fill:'#ea580c', label:'B' }, ball:{}, cone:{}, hoop:{}, x:{}, text:{} };
 const BOARD_LABELS = ['corta','medio','línea','diago','diago corta','larga','2','4'];
 function boardDefault(){
-  return { tool:'pen', color:BOARD_COLORS[0], horiz:false, zones:false, strokes:[], cur:null, drag:null, tokens:[
+  return { tool:'move', color:BOARD_COLORS[0], horiz:false, zones:false, strokes:[], cur:null, drag:null, tokens:[
     { id:uid(), kind:'A', n:1, u:.36, v:.30 }, { id:uid(), kind:'A', n:2, u:.64, v:.38 },
     { id:uid(), kind:'B', n:1, u:.36, v:.70 }, { id:uid(), kind:'B', n:2, u:.64, v:.62 },
     { id:uid(), kind:'ball', u:.5, v:.5 },
@@ -1038,7 +1039,7 @@ function boardAdd(kind, text){
 function boardLabel(){ const t = prompt('Texto de la etiqueta', ''); if (t && t.trim()) boardAdd('text', t.trim().slice(0, 18)); }
 function boardToggleZones(){ board.zones = !board.zones; renderBoardTools(); boardDraw(); }
 function renderBoardTools(){
-  const tools = [['pen','edit','Lápiz'],['arrow','arrow','Flecha'],['zone','zone','Zona'],['erase','eraser','Borrar']];
+  const tools = [['move','move','Mover'],['pen','edit','Lápiz'],['arrow','arrow','Flecha'],['zone','zone','Zona'],['erase','eraser','Borrar']];
   document.getElementById('board-tools').innerHTML = `
     <div class="trow">
       ${tools.map(([id,icn,lb]) => `<button class="tb ${board.tool===id?'on':''}" onclick="boardSet('tool','${id}')">${ic(icn)} ${lb}</button>`).join('')}
@@ -1059,7 +1060,7 @@ function renderBoardTools(){
       ${BOARD_LABELS.map(l => `<button class="tb sm" onclick="boardAdd('text','${l}')">${l}</button>`).join('')}
       <button class="tb sm" onclick="boardLabel()">${ic('plus')} texto</button>
     </div>
-    <div class="trow" style="padding-top:0"><small style="color:#64748b">Arrastra fichas y etiquetas · <b>Zona</b>: arrastra para sombrear un área · con <b>Borrar</b> quitas cualquier cosa</small></div>`;
+    <div class="trow" style="padding-top:0"><small style="color:#64748b"><b>Mover</b> solo arrastra fichas, sin pintar · <b>Zona</b>: arrastra para sombrear un área · con <b>Borrar</b> quitas cualquier cosa</small></div>`;
 }
 function boardResize(){
   const cv = document.getElementById('board-cv'); if (!cv) return;
@@ -1194,6 +1195,7 @@ function boardDown(e){
   if (board.tool === 'erase') { board.pid = e.pointerId; board.erasing = true; boardErase(x, y, P, R); boardDraw(); return; }
   const hit = boardHit(x, y, P, R);
   if (hit) { const [tx,ty] = P(hit.u, hit.v); board.drag = { t: hit, dx: tx - x, dy: ty - y, pid: e.pointerId }; board.tokens = [...board.tokens.filter(t => t !== hit), hit]; return; }
+  if (board.tool === 'move') return;
   board.cur = { type: board.tool, color: board.color, pts: [uv], pid: e.pointerId };
 }
 function boardMove(e){
