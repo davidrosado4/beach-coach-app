@@ -179,7 +179,67 @@ label.f input:focus,label.f select:focus,label.f textarea:focus{outline:none;bor
 .run .ritem .d{color:#94a3b8;font-size:.9rem;white-space:pre-wrap;margin-top:4px;display:flex;gap:6px;align-items:flex-start}
 .run .ritem .d .ic{margin-top:3px;color:#64748b}
 .run .ritem .dur{color:var(--c);font-weight:800;font-size:1rem;flex:none}
+.run .ritem .side{display:flex;flex-direction:column;align-items:flex-end;flex:none;gap:2px}
+.run .ritem .pt{color:#64748b;font-size:.75rem;font-weight:700;font-variant-numeric:tabular-nums}
+.run .ritem.now{background:#263247;box-shadow:0 0 0 2px var(--c)}
+.run .ritem.now.done{opacity:.7}
 .run .notes{background:#1e293b;border-radius:14px;padding:12px 14px;white-space:pre-wrap;color:#cbd5e1}
+/* Reloj fijo arriba en modo entreno */
+.run .rclock{position:sticky;top:env(safe-area-inset-top);z-index:5;background:#0f172a;box-shadow:0 -14px 0 #0f172a;padding:2px 0 8px;margin-bottom:8px;border-bottom:1px solid #1e293b}
+.run .rclock .big{font-size:3.2rem;font-weight:800;color:#fff;letter-spacing:.02em;font-variant-numeric:tabular-nums;line-height:1}
+.run .rclock .meta{text-align:center;color:#94a3b8;font-size:.85rem;margin-top:6px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:5px;cursor:pointer}
+.run .rclock .meta.late{color:#f87171}
+.run .rclock .meta.early{color:#7dd3fc}
+.run .rclock .meta.ok{color:#4ade80}
+.run .rclock .btn{background:#1e293b;color:#7dd3fc;border-color:#334155;box-shadow:none}
+
+/* Pizarra táctica */
+.board{position:fixed;inset:0;background:#0f172a;z-index:60;display:flex;flex-direction:column;color:#e2e8f0;padding-top:env(safe-area-inset-top)}
+.board-top{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:6px 10px}
+.board-top .back{color:#7dd3fc}
+.board-top .ttl{font-weight:800;display:inline-flex;align-items:center;gap:6px}
+.board-wrap{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:4px}
+.board-wrap canvas{touch-action:none;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,.45);display:block}
+.board-tools{background:#1e293b;padding:6px 8px calc(8px + env(safe-area-inset-bottom))}
+.board-tools .trow{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;padding:3px 0}
+.board-tools .tb{min-width:42px;height:42px;padding:0 10px;border-radius:12px;background:#334155;color:#e2e8f0;display:inline-flex;align-items:center;justify-content:center;gap:4px;font-weight:800;font-size:.8rem}
+.board-tools .tb .ic{width:20px;height:20px}
+.board-tools .tb.on{background:#0284c7;color:#fff}
+.board-tools .tb.tok{border-radius:50%;width:42px;padding:0}
+.board-tools .sw{width:28px;height:28px;border-radius:50%;border:3px solid transparent;flex:none}
+.board-tools .sw.on{border-color:#fff}
+.board-tools .sep{width:1px;height:28px;background:#475569;margin:0 4px}
+
+/* Mocho: marcador */
+.mocho{position:fixed;inset:0;background:#0f172a;z-index:60;display:flex;flex-direction:column;color:#e2e8f0;padding:env(safe-area-inset-top) 0 calc(12px + env(safe-area-inset-bottom));overflow-y:auto;-webkit-overflow-scrolling:touch}
+.mocho>*{width:100%;max-width:640px;margin-left:auto;margin-right:auto}
+.mocho-top{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:6px 10px}
+.mocho-top .back{color:#7dd3fc}
+.mocho-top .ttl{font-weight:800;display:inline-flex;align-items:center;gap:6px}
+.mocho .mclock{text-align:center;color:#94a3b8;font-weight:700;font-size:.82rem;padding:2px 12px 4px}
+.mocho .mclock b{display:block;color:#fff;font-size:1.6rem;font-variant-numeric:tabular-nums;line-height:1.1}
+.mocho .courts{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:8px 12px}
+.mocho .side-p{background:#1e293b;border-radius:18px;padding:12px 8px 10px;text-align:center;cursor:pointer;border:3px solid transparent;user-select:none;-webkit-user-select:none}
+.mocho .side-p:active{transform:scale(.97)}
+.mocho .side-p.a{border-color:#2563eb}.mocho .side-p.b{border-color:#ea580c}
+.mocho .side-p.won{border-color:#16a34a;background:#14532d}
+.mocho .side-p .nm{font-weight:800;font-size:.95rem;min-height:2.4em;display:flex;align-items:center;justify-content:center;color:#fff;word-break:break-word}
+.mocho .side-p .sc{font-size:4.6rem;font-weight:900;line-height:1;color:#fff;font-variant-numeric:tabular-nums;margin:4px 0}
+.mocho .side-p .lb{font-size:.7rem;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em;font-weight:700;display:flex;align-items:center;justify-content:center;gap:4px}
+.mocho .side-p.a .lb.top{color:#60a5fa}.mocho .side-p.b .lb.top{color:#fb923c}
+.mocho .banner{margin:4px 12px 8px;background:#facc15;color:#422006;border-radius:14px;padding:10px 12px;text-align:center;font-weight:800;display:flex;align-items:center;justify-content:center;gap:6px}
+.mocho .banner.win{background:#16a34a;color:#fff}
+.mocho .macts{display:flex;gap:8px;padding:4px 12px 8px;flex-wrap:wrap}
+.mocho .macts .btn{flex:1;background:#1e293b;color:#e2e8f0;border-color:#334155;box-shadow:none}
+.mocho .macts .btn.go{background:#0284c7;color:#fff;border-color:#0284c7}
+.mocho .tally{padding:4px 12px}
+.mocho .tally h4{margin:6px 4px 6px;font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:#94a3b8;display:flex;justify-content:space-between}
+.mocho .tally .tr{display:flex;align-items:center;gap:8px;background:#1e293b;border-radius:12px;padding:9px 12px;margin-bottom:6px;cursor:pointer}
+.mocho .tally .tr.on{outline:2px solid #e11d48}
+.mocho .tally .tr b{flex:1;color:#fff}
+.mocho .tally .tr .n{font-size:1.25rem;font-weight:900;color:#fff;min-width:28px;text-align:right;font-variant-numeric:tabular-nums}
+.mocho .tally .tr .q{font-size:.72rem;color:#94a3b8;font-weight:700}
+.mocho .mhint{padding:4px 16px;color:#64748b;font-size:.8rem;text-align:center}
 
 /* Schedule */
 .day{margin-bottom:8px}
@@ -220,10 +280,12 @@ label.f input:focus,label.f select:focus,label.f textarea:focus{outline:none;bor
 <main id="app"></main>
 <nav id="tabs"></nav>
 <div id="modal-root"></div>
+<div id="board-root"></div>
+<div id="mocho-root"></div>
 
 <script>
 // Sube este número cada vez que cambies la app (y el VERSION de sw.js) para saber qué versión tienes en el móvil.
-const APP_VERSION = '12';
+const APP_VERSION = '13';
 
 /* ============================ ICONOS (SVG propios) ============================ */
 const ICONS = {
@@ -268,6 +330,12 @@ const ICONS = {
   phone:    '<rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/>',
   database: '<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/>',
   sparkle:  '<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2 2M16 16l2 2M6 18l2-2M16 8l2-2"/>',
+  board:    '<rect x="4" y="2" width="16" height="20" rx="2"/><path d="M4 12h16M8 7h8M8 17h8"/>',
+  arrow:    '<path d="M5 19 19 5M9 5h10v10"/>',
+  eraser:   '<path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"/><path d="M22 21H7M5 11l9 9"/>',
+  undo:     '<path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-15-6.7L3 13"/>',
+  trophy:   '<path d="M8 21h8M12 17v4M6 3h12v6a6 6 0 0 1-12 0z"/><path d="M6 5H3v2a4 4 0 0 0 4 4M18 5h3v2a4 4 0 0 1-4 4"/>',
+  crown:    '<path d="m3 18 2-11 5 5 2-7 2 7 5-5 2 11z"/><path d="M3 21h18"/>',
 };
 const ic = (n, cls = '') => `<svg class="ic ${cls}" viewBox="0 0 24 24" aria-hidden="true">${ICONS[n] || ''}</svg>`;
 
@@ -305,6 +373,18 @@ const TECH_TREE = {
 const TECH_CATS = Object.keys(TECH_TREE);
 const COLORS = ['#22c55e','#3b82f6','#f59e0b','#ef4444','#a855f7','#ec4899','#14b8a6','#64748b'];
 
+/* Mocho: juego final del entreno */
+const MOCHO_COLOR = '#e11d48';
+const MOCHO_MODES = [
+  { id:'king',  name:'King',          desc:'Rey de la pista: la pareja que gana el punto se queda como rey y la que pierde sale. Solo puntúa el rey al ganar el punto.' },
+  { id:'p21',   name:'Partido a 21',  desc:'Un partido 2v2 a 21 puntos con diferencia de dos. Cambio de campo cada 7 puntos.' },
+  { id:'best3', name:'Mejor de 3',    desc:'Mini-partidos al mejor de 3 (gana quien llega a 2). Van entrando parejas y se cuentan los partidos ganados.' },
+  { id:'p3',    name:'A 3 (máx. 5)',  desc:'Mini-partidos a 3 puntos con diferencia de dos, máximo 5. Van entrando parejas y se cuentan los partidos ganados.' },
+];
+const mochoMode = id => MOCHO_MODES.find(x => x.id === id) || MOCHO_MODES[0];
+function mochoDefault(on){ return { on, mode:'king', duration:20, pairs:'', live:null }; }
+function mochoPairs(m){ return (m.pairs || '').split('\n').map(x => x.trim()).filter(Boolean); }
+
 /* ============================ DATOS ============================ */
 function defaultState(){
   return {
@@ -318,7 +398,7 @@ function defaultState(){
   };
 }
 function migrate(s){
-  s.sessions.forEach(x => { x.blocks = x.blocks || {}; PHASES.forEach(p => { x.blocks[p.id] = x.blocks[p.id] || []; }); x.focusSub = x.focusSub || ''; x.title = x.title || ''; x.notes = x.notes || ''; });
+  s.sessions.forEach(x => { x.blocks = x.blocks || {}; PHASES.forEach(p => { x.blocks[p.id] = x.blocks[p.id] || []; }); x.focusSub = x.focusSub || ''; x.title = x.title || ''; x.notes = x.notes || ''; x.mocho = x.mocho || mochoDefault(false); });
   s.exercises.forEach(e => { if (e.tech === 'Juego real') e.tech = 'Juego'; e.sub = e.sub || ''; e.levelIds = e.levelIds || []; });
   s.groups.forEach(g => { g.schedule = g.schedule || []; });
   return s;
@@ -361,6 +441,7 @@ function render(){
   tabs.style.display = route.view === 'run' ? 'none' : '';
   document.body.classList.toggle('run-mode', route.view === 'run');
   const tc = document.querySelector('meta[name="theme-color"]'); if (tc) tc.content = route.view === 'run' ? '#0f172a' : '#0284c7';
+  if (route.view === 'run') tickClock();
 }
 
 /* ============================ HELPERS UI ============================ */
@@ -377,7 +458,7 @@ function phaseTag(pid){ const p = phase(pid); return p ? `<span class="tag phase
 function techTag(ex){ const t = techLabel(ex); return t ? `<span class="tag">${esc(t)}</span>` : ''; }
 function empty(text, icon='umbrella'){ return `<div class="empty">${ic(icon)}<div>${text}</div></div>`; }
 function groupName(id){ const g = byId(state.groups, id); return g ? g.name : 'Sin grupo'; }
-function sessionTotal(s){ return PHASES.reduce((a,p) => a + (s.blocks[p.id]||[]).reduce((b,i) => b + (+i.duration||0), 0), 0); }
+function sessionTotal(s){ return PHASES.reduce((a,p) => a + (s.blocks[p.id]||[]).reduce((b,i) => b + (+i.duration||0), 0), 0) + (s.mocho && s.mocho.on ? (+s.mocho.duration||0) : 0); }
 function sessionCount(s){ return PHASES.reduce((a,p) => a + (s.blocks[p.id]||[]).length, 0); }
 function sessionFocus(s){ return s.focus ? (s.focusSub ? `${s.focus} · ${s.focusSub}` : s.focus) : ''; }
 function sessionTitle(s){ return s.title || (s.focus ? `Entreno de ${s.focus.toLowerCase()}` : 'Entreno'); }
@@ -408,7 +489,7 @@ function weekData(monISO){
 }
 function createSession(groupId, date){
   const s = { id:uid(), groupId: groupId || (state.groups[0] ? state.groups[0].id : ''), date: date || todayISO(),
-    focus:'', focusSub:'', title:'', notes:'', blocks:{} };
+    focus:'', focusSub:'', title:'', notes:'', blocks:{}, mocho: mochoDefault(true) };
   PHASES.forEach(p => s.blocks[p.id] = []);
   state.sessions.push(s); save(); return s;
 }
@@ -422,7 +503,7 @@ function prepareWeek(){
 function copyLast(groupId, iso){
   const prev = state.sessions.filter(x => x.groupId === groupId && x.date < iso && sessionCount(x) > 0).sort((a,b) => b.date.localeCompare(a.date))[0];
   if (!prev) { alert('Este grupo todavía no tiene entrenos anteriores con contenido.'); return; }
-  const c = JSON.parse(JSON.stringify(prev)); c.id = uid(); c.date = iso; state.sessions.push(c); save(); go('session', { id:c.id });
+  const c = JSON.parse(JSON.stringify(prev)); c.id = uid(); c.date = iso; c.mocho.live = null; state.sessions.push(c); save(); go('session', { id:c.id });
 }
 
 /* ============================ HOY ============================ */
@@ -554,7 +635,7 @@ function deleteSession(id){
 }
 function duplicateSession(id){
   const s = byId(state.sessions, id); if (!s) return;
-  const c = JSON.parse(JSON.stringify(s)); c.id = uid(); state.sessions.push(c); save(); go('session', { id:c.id });
+  const c = JSON.parse(JSON.stringify(s)); c.id = uid(); c.mocho.live = null; state.sessions.push(c); save(); go('session', { id:c.id });
 }
 function updItem(sid, pid, idx, k, v){ const s = byId(state.sessions, sid); s.blocks[pid][idx][k] = k === 'duration' ? +v : v; save(); render(); }
 function moveItem(sid, pid, idx, dir){
@@ -596,6 +677,7 @@ function renderSession(){
     <div class="total"><span>${ic('clock')} Duración total</span><b>${total} min</b></div>
   </div>
   ${PHASES.map(p => renderBlock(s, p)).join('')}
+  ${renderMochoBlock(s)}
   <div class="card"><label class="f">Notas del entreno<textarea placeholder="Recordatorios, material, quién falta..." onchange="updSession('${s.id}','notes',this.value)">${esc(s.notes)}</textarea></label></div>
   <button class="btn danger block" onclick="deleteSession('${s.id}')">${ic('trash')} Eliminar entreno</button>`;
 }
@@ -624,6 +706,28 @@ function renderBlock(s, p){
     <div class="block-actions">
       <button class="btn small primary" onclick="openPicker('${s.id}','${p.id}')">${ic('book')} De la batería</button>
       <button class="btn small" onclick='openExerciseForm(null,${esc(pre)})'>${ic('plus')} Crear nuevo</button>
+    </div>
+  </section>`;
+}
+
+/* ---- Bloque Mocho en el editor ---- */
+function updMocho(id, k, v){ const s = byId(state.sessions, id); if (!s) return; s.mocho[k] = k === 'duration' ? +v : v; if (k === 'mode' || k === 'pairs') s.mocho.live = null; save(); render(); }
+function renderMochoBlock(s){
+  const m = s.mocho, md = mochoMode(m.mode);
+  return `<section class="block" style="--c:${MOCHO_COLOR}">
+    <div class="block-head"><div class="bic">${ic('trophy')}</div><div class="grow"><h3>Mocho · juego final</h3><small>${m.on ? `${md.name} · ${m.duration} min` : 'Desactivado'}</small></div></div>
+    <div style="padding:0 14px 14px">
+      <label class="toggle" style="margin:0 0 6px"><input type="checkbox" ${m.on?'checked':''} onchange="updMocho('${s.id}','on',this.checked)">Hacer mocho al final del entreno</label>
+      ${m.on ? `
+      <div class="seg" style="margin-bottom:8px">${MOCHO_MODES.map(x => `<button type="button" class="${m.mode===x.id?'on':''}" style="--c:${MOCHO_COLOR};flex:1 1 40%" onclick="updMocho('${s.id}','mode','${x.id}')">${x.name}</button>`).join('')}</div>
+      <p class="hint" style="margin:0 0 12px">${md.desc}</p>
+      <div class="grid2">
+        <label class="f">Duración (min)<input type="number" min="0" inputmode="numeric" value="${m.duration}" onchange="updMocho('${s.id}','duration',this.value)"></label>
+        <div style="display:flex;align-items:flex-end;margin-bottom:12px"><button class="btn block" style="margin:0;background:${MOCHO_COLOR};color:#fff;border-color:${MOCHO_COLOR}" onclick="openMocho('${s.id}')">${ic('trophy')} Marcador</button></div>
+      </div>
+      ${m.mode === 'p21' ? `<label class="f">Parejas (una por línea, opcional)<textarea style="min-height:60px" placeholder="Ana y Luis&#10;Marta y Pol" onchange="updMocho('${s.id}','pairs',this.value)">${esc(m.pairs)}</textarea></label>`
+        : `<label class="f">Parejas (una por línea, opcional)<textarea placeholder="Ana y Luis&#10;Marta y Pol&#10;Jon y Sara&#10;..." onchange="updMocho('${s.id}','pairs',this.value)">${esc(m.pairs)}</textarea></label>`}
+      ${m.live && (m.live.games || m.live.pairs.some(p => p.pts)) ? `<small>${ic('info')} Hay un marcador en curso guardado. Cambiar la modalidad o las parejas lo reinicia.</small>` : ''}` : ''}
     </div>
   </section>`;
 }
@@ -676,13 +780,58 @@ function pickerList(list, inSession, s){
 /* ============================ MODO ENTRENO ============================ */
 let done = {};
 function toggleDone(k){ done[k] = !done[k]; render(); }
+/* Hora de inicio: la del horario del grupo ese día, o la que fije el coach a mano */
+let runStartOverride = {};
+const toMin = hhmm => { const [h,m] = hhmm.split(':').map(Number); return h*60 + m; };
+const fromMin = m => { m = ((m % 1440) + 1440) % 1440; return `${pad(Math.floor(m/60))}:${pad(m%60)}`; };
+const nowMin = () => { const d = new Date(); return d.getHours()*60 + d.getMinutes(); };
+function runSlot(s){ const g = byId(state.groups, s.groupId); if (!g) return null; const dow = fromISO(s.date).getDay(); return g.schedule.filter(x => x.day === dow).sort((a,b) => a.start.localeCompare(b.start))[0] || null; }
+function runStart(s){ return runStartOverride[s.id] || (runSlot(s) ? runSlot(s).start : ''); }
+function setRunStart(id){
+  const s = byId(state.sessions, id); if (!s) return;
+  const v = prompt('Hora de inicio del entreno (HH:MM).\nDéjalo vacío para volver a la del horario.', runStart(s) || fromMin(nowMin()));
+  if (v === null) return;
+  const m = v.trim().match(/^(\d{1,2})[:.hH](\d{2})$/);
+  if (!v.trim()) delete runStartOverride[id];
+  else if (m) runStartOverride[id] = `${pad(+m[1])}:${m[2]}`;
+  else { alert('Formato no válido. Ejemplo: 18:30'); return; }
+  render();
+}
+function tickClock(){
+  const mc = document.getElementById('mc-time');
+  if (mc && mochoSid) { const s2 = byId(state.sessions, mochoSid); if (s2) document.querySelector('.mocho .mclock').innerHTML = mochoClockHtml(s2); }
+  const el = document.getElementById('rc-time'); if (!el) return;
+  const now = nowMin(); el.textContent = fromMin(now);
+  const s = byId(state.sessions, route.id); if (!s) return;
+  const meta = document.getElementById('rc-meta'); const start = runStart(s);
+  meta.className = 'meta';
+  if (!start) { meta.innerHTML = `${ic('edit')} Toca para fijar la hora de inicio`; return; }
+  const st = toMin(start), end = st + sessionTotal(s), slot = runSlot(s);
+  const left = end - now;
+  let txt, cls = '';
+  if (now < st) { txt = `Empieza a las ${start} · faltan ${st-now}'`; cls = 'early'; }
+  else if (left >= 0) { txt = `Fin previsto ${fromMin(end)} · quedan ${left}'`; cls = left <= 5 ? 'late' : 'ok'; }
+  else { txt = `Fin previsto ${fromMin(end)} · te pasas ${-left}'`; cls = 'late'; }
+  if (slot && slot.end && toMin(slot.end) < end) txt += ` · horario hasta ${slot.end}`;
+  meta.className = 'meta ' + cls; meta.innerHTML = `${txt} ${ic('edit')}`;
+  document.querySelectorAll('.ritem[data-s]').forEach(r => r.classList.toggle('now', now >= +r.dataset.s && now < +r.dataset.e));
+}
+setInterval(tickClock, 1000);
 function renderRun(){
   const s = byId(state.sessions, route.id); if (!s) return renderSemana();
   const g = byId(state.groups, s.groupId);
+  const start = runStart(s); let t = start ? toMin(start) : null;
   return `<div class="run">
-    <div class="page-head"><button class="back" onclick="go('session',{id:'${s.id}'})">${ic('left')} Salir</button><span style="color:#94a3b8;font-weight:700">${ic('clock')} ${sessionTotal(s)} min</span></div>
+    <div class="rclock">
+      <div class="row between">
+        <button class="back" onclick="go('session',{id:'${s.id}'})">${ic('left')} Salir</button>
+        <div class="big" id="rc-time">${fromMin(nowMin())}</div>
+        <button class="btn small" onclick="openBoard()">${ic('board')} Pizarra</button>
+      </div>
+      <div class="meta" id="rc-meta" onclick="setRunStart('${s.id}')"></div>
+    </div>
     <div class="rhead">
-      <div style="color:#7dd3fc;font-weight:700;font-size:.85rem">${fmtDate(s.date)} · ${esc(groupName(s.groupId))}${g ? ` · ${esc(level(g.levelId)?.name||'')}` : ''}</div>
+      <div style="color:#7dd3fc;font-weight:700;font-size:.85rem">${fmtDate(s.date)} · ${esc(groupName(s.groupId))}${g ? ` · ${esc(level(g.levelId)?.name||'')}` : ''} · ${sessionTotal(s)} min</div>
       <h1>${esc(sessionTitle(s))}</h1>
       ${sessionFocus(s) ? `<div style="color:#94a3b8;margin-top:4px">${ic('target')} ${esc(sessionFocus(s))}</div>` : ''}
     </div>
@@ -692,7 +841,8 @@ function renderRun(){
       return `<div class="rblock" style="--c:${p.color}">
         <h3><span>${ic(p.icon)} ${p.id==='tech' && s.focus ? esc(sessionFocus(s)) : p.name}</span><span>${sub} min</span></h3>
         ${items.map((it, idx) => { const ex = byId(state.exercises, it.exId); const k = `${s.id}-${p.id}-${idx}`;
-          return `<div class="ritem ${done[k]?'done':''}" onclick="toggleDone('${k}')">
+          let plan = '', pt = ''; if (t !== null) { const a = t; t += (+it.duration||0); plan = ` data-s="${a}" data-e="${t}"`; pt = `<span class="pt">${fromMin(a)}</span>`; }
+          return `<div class="ritem ${done[k]?'done':''}"${plan} onclick="toggleDone('${k}')">
             <div class="chk">${done[k]?ic('check'):''}</div>
             <div class="grow"><b>${esc(ex ? ex.name : '(eliminado)')}</b>
               ${ex && ex.sub ? `<div class="d"><span style="color:#94a3b8;font-size:.8rem">${esc(techLabel(ex))}</span></div>` : ''}
@@ -700,11 +850,303 @@ function renderRun(){
               ${ex && ex.material ? `<div class="d">${ic('bag')}<span>${esc(ex.material)}</span></div>` : ''}
               ${ex && ex.variants ? `<div class="d">${ic('repeat')}<span>${esc(ex.variants)}</span></div>` : ''}
             </div>
-            <div class="dur">${it.duration}'</div>
+            <div class="side"><div class="dur">${it.duration}'</div>${pt}</div>
           </div>`; }).join('')}
       </div>`; }).join('')}
+    ${s.mocho.on ? (() => { const m = s.mocho, md = mochoMode(m.mode), pairs = mochoPairs(m);
+      let plan = '', pt = ''; if (t !== null) { const a = t; t += (+m.duration||0); plan = ` data-s="${a}" data-e="${t}"`; pt = `<span class="pt">${fromMin(a)}</span>`; }
+      return `<div class="rblock" style="--c:${MOCHO_COLOR}">
+        <h3><span>${ic('trophy')} Mocho</span><span>${m.duration} min</span></h3>
+        <div class="ritem"${plan} onclick="openMocho('${s.id}')">
+          <div class="chk" style="border-color:${MOCHO_COLOR};color:${MOCHO_COLOR}">${ic('trophy')}</div>
+          <div class="grow"><b>${md.name}</b>
+            <div class="d">${ic('info')}<span>${md.desc}</span></div>
+            ${pairs.length ? `<div class="d">${ic('users')}<span>${esc(pairs.join(' · '))}</span></div>` : ''}
+          </div>
+          <div class="side"><div class="dur">${m.duration}'</div>${pt}</div>
+        </div>
+        <button class="btn block" style="background:${MOCHO_COLOR};color:#fff;border-color:${MOCHO_COLOR}" onclick="openMocho('${s.id}')">${ic('trophy')} Abrir marcador</button>
+      </div>`; })() : ''}
     ${s.notes ? `<div class="rblock" style="--c:#94a3b8"><h3><span>${ic('notes')} Notas</span></h3><div class="notes">${esc(s.notes)}</div></div>` : ''}
   </div>`;
+}
+
+/* ============================ MOCHO (marcador) ============================ */
+let mochoSid = null;
+function mochoInit(s){
+  const m = s.mocho; let names = mochoPairs(m);
+  if (m.mode === 'p21') names = [names[0] || 'Pareja A', names[1] || 'Pareja B'];
+  else if (names.length < 2) names = [...names, ...[1,2,3,4].map(i => `Pareja ${i}`)].slice(0, 4);
+  const pairs = names.map(n => ({ name:n, pts:0, wins:0 }));
+  m.live = { mode:m.mode, pairs, court:[0,1], queue: pairs.map((_,i) => i).slice(2), a:0, b:0, ended:null, games:0, hist:[] };
+  save(); return m.live;
+}
+function openMocho(id){
+  const s = byId(state.sessions, id); if (!s) return; mochoSid = id;
+  if (!s.mocho.live || s.mocho.live.mode !== s.mocho.mode) mochoInit(s);
+  renderMocho();
+}
+function closeMocho(){ document.getElementById('mocho-root').innerHTML = ''; mochoSid = null; if (route.view === 'run' || route.view === 'session') render(); }
+function mLive(){ const s = byId(state.sessions, mochoSid); return s ? s.mocho.live : null; }
+function mSnap(L){ const { hist, ...rest } = L; hist.push(JSON.stringify(rest)); if (hist.length > 60) hist.shift(); }
+function mochoUndo(){ const L = mLive(); if (!L || !L.hist.length) return; Object.assign(L, JSON.parse(L.hist.pop())); save(); renderMocho(); }
+function mochoWinner(L){
+  const d = Math.abs(L.a - L.b), mx = Math.max(L.a, L.b), w = L.a > L.b ? 0 : 1;
+  if (L.mode === 'p21')   return (mx >= 21 && d >= 2) ? w : null;
+  if (L.mode === 'best3') return mx >= 2 ? w : null;
+  if (L.mode === 'p3')    return ((mx >= 3 && d >= 2) || mx >= 5) ? w : null;
+  return null;
+}
+function mochoPoint(side){
+  const L = mLive(); if (!L || L.ended !== null) return; mSnap(L);
+  if (L.mode === 'king') {
+    const [k, c] = L.court;
+    if (side === 0) { L.pairs[k].pts++; if (L.queue.length) { L.queue.push(c); L.court = [k, L.queue.shift()]; } }
+    else { if (L.queue.length) { L.queue.push(k); L.court = [c, L.queue.shift()]; } else L.court = [c, k]; }
+  } else {
+    side === 0 ? L.a++ : L.b++;
+    const w = mochoWinner(L); if (w !== null) { L.ended = w; L.pairs[L.court[w]].wins++; L.games++; }
+  }
+  save(); renderMocho();
+}
+function mochoNext(keepWinner){
+  const L = mLive(); if (!L || L.ended === null) return; mSnap(L);
+  const w = L.court[L.ended], l = L.court[1 - L.ended];
+  if (L.mode === 'p21' || !L.queue.length) L.court = [L.court[1], L.court[0]];
+  else if (keepWinner) { L.queue.push(l); L.court = [w, L.queue.shift()]; }
+  else { L.queue.push(w, l); L.court = [L.queue.shift(), L.queue.shift()]; }
+  L.a = 0; L.b = 0; L.ended = null; save(); renderMocho();
+}
+function mochoAddPair(){
+  const L = mLive(); if (!L) return;
+  const n = prompt('Nombre de la nueva pareja', `Pareja ${L.pairs.length + 1}`); if (!n || !n.trim()) return;
+  mSnap(L); L.pairs.push({ name:n.trim(), pts:0, wins:0 }); L.queue.push(L.pairs.length - 1); save(); renderMocho();
+}
+function mochoRename(i){
+  const L = mLive(); if (!L) return;
+  const n = prompt('Nombre de la pareja', L.pairs[i].name); if (!n || !n.trim()) return;
+  L.pairs[i].name = n.trim(); save(); renderMocho();
+}
+function mochoReset(){
+  const s = byId(state.sessions, mochoSid); if (!s) return;
+  if (!confirm('¿Reiniciar el marcador? Se borran los puntos y partidos ganados.')) return;
+  mochoInit(s); renderMocho();
+}
+function mochoClockHtml(s){
+  const start = runStart(s); if (!start) return `<b id="mc-time">${fromMin(nowMin())}</b>`;
+  const end = toMin(start) + sessionTotal(s), left = end - nowMin();
+  return `<b id="mc-time">${fromMin(nowMin())}</b><span id="mc-left">${left >= 0 ? `quedan ${left}'` : `te pasas ${-left}'`} · fin ${fromMin(end)}</span>`;
+}
+function renderMocho(){
+  const s = byId(state.sessions, mochoSid); if (!s) return; const L = s.mocho.live, md = mochoMode(L.mode);
+  const isKing = L.mode === 'king', rot = L.mode === 'best3' || L.mode === 'p3';
+  const A = L.pairs[L.court[0]], B = L.pairs[L.court[1]];
+  const panel = (side, P, cls) => `<div class="side-p ${cls} ${L.ended===side?'won':''}" onclick="mochoPoint(${side})">
+      <div class="lb top">${isKing ? (side===0 ? `${ic('crown')} Rey` : 'Retador') : (side===0 ? 'Lado A' : 'Lado B')}</div>
+      <div class="nm">${esc(P.name)}</div>
+      <div class="sc">${isKing ? P.pts : (side===0 ? L.a : L.b)}</div>
+      <div class="lb">${isKing ? (side===0 ? 'toca si gana el rey' : 'toca si gana el retador') : (rot ? `${P.wins} ganado${P.wins===1?'':'s'}` : `${P.wins} partido${P.wins===1?'':'s'}`)}</div>
+    </div>`;
+  const total = L.a + L.b;
+  let banner = '';
+  if (L.ended !== null) banner = `<div class="banner win">${ic('trophy')} Gana ${esc(L.pairs[L.court[L.ended]].name)} · ${L.a}–${L.b}</div>
+    <div class="macts">${rot && L.queue.length
+      ? `<button class="btn go" onclick="mochoNext(true)">${ic('right')} Sigue el ganador</button><button class="btn" onclick="mochoNext(false)">${ic('users')} Entran dos nuevas</button>`
+      : `<button class="btn go" onclick="mochoNext(true)">${ic('repeat')} Otro partido</button>`}</div>`;
+  else if (L.mode === 'p21' && total > 0 && total % 7 === 0) banner = `<div class="banner">${ic('repeat')} Cambio de campo (${total} puntos)</div>`;
+  const rows = L.pairs.map((p, i) => ({ p, i })).sort((x, y) => isKing ? y.p.pts - x.p.pts : y.p.wins - x.p.wins);
+  const tally = (isKing || rot) ? `<div class="tally">
+      <h4><span>Clasificación</span><span>${isKing ? 'puntos' : `partidos · ${L.games} jugados`}</span></h4>
+      ${rows.map(({ p, i }) => `<div class="tr ${L.court.includes(i)?'on':''}" onclick="mochoRename(${i})">
+        <b>${esc(p.name)}</b>
+        <span class="q">${L.court.includes(i) ? (isKing && L.court[0] === i ? 'rey' : 'en pista') : (L.queue.indexOf(i) === 0 ? 'siguiente' : `${L.queue.indexOf(i)+1}º en espera`)}</span>
+        <span class="n">${isKing ? p.pts : p.wins}</span>
+      </div>`).join('')}
+    </div>` : '';
+  document.getElementById('mocho-root').innerHTML = `<div class="mocho">
+    <div class="mocho-top">
+      <button class="back" onclick="closeMocho()">${ic('x')} Cerrar</button>
+      <span class="ttl">${ic('trophy')} Mocho · ${md.name}</span>
+      <div class="row" style="gap:4px">
+        <button class="icon-btn" style="background:#334155;color:#e2e8f0" title="Deshacer" onclick="mochoUndo()">${ic('undo')}</button>
+        <button class="icon-btn" style="background:#334155;color:#e2e8f0" title="Reiniciar" onclick="mochoReset()">${ic('trash')}</button>
+      </div>
+    </div>
+    <div class="mclock">${mochoClockHtml(s)}</div>
+    <div class="courts">${panel(0, A, 'a')}${panel(1, B, 'b')}</div>
+    ${banner}
+    ${tally}
+    ${(isKing || rot) ? `<div class="macts"><button class="btn" onclick="mochoAddPair()">${ic('plus')} Añadir pareja</button></div>` : ''}
+    <div class="mhint">${md.desc}${(isKing || rot) ? ' Toca una pareja de la lista para cambiarle el nombre.' : ''}</div>
+  </div>`;
+}
+
+/* ============================ PIZARRA ============================ */
+let board = null;
+const BOARD_COLORS = ['#facc15','#ffffff','#38bdf8','#f97316','#4ade80','#1e293b'];
+const TOKEN_KINDS = { A:{ fill:'#2563eb', label:'A' }, B:{ fill:'#ea580c', label:'B' }, E:{ fill:'#16a34a', label:'E' }, ball:{}, cone:{} };
+function boardDefault(){
+  return { tool:'pen', color:BOARD_COLORS[0], horiz:false, strokes:[], cur:null, drag:null, tokens:[
+    { id:uid(), kind:'A', n:1, u:.36, v:.30 }, { id:uid(), kind:'A', n:2, u:.64, v:.38 },
+    { id:uid(), kind:'B', n:1, u:.36, v:.70 }, { id:uid(), kind:'B', n:2, u:.64, v:.62 },
+    { id:uid(), kind:'ball', u:.5, v:.5 },
+  ] };
+}
+function openBoard(){
+  board = board || boardDefault();
+  document.getElementById('board-root').innerHTML = `<div class="board">
+    <div class="board-top">
+      <button class="back" onclick="closeBoard()">${ic('x')} Cerrar</button>
+      <span class="ttl">${ic('board')} Pizarra</span>
+      <div class="row" style="gap:4px">
+        <button class="icon-btn" style="background:#334155;color:#e2e8f0" title="Deshacer" onclick="boardUndo()">${ic('undo')}</button>
+        <button class="icon-btn" style="background:#334155;color:#e2e8f0" title="Limpiar dibujos" onclick="boardClear()">${ic('trash')}</button>
+        <button class="icon-btn" style="background:#334155;color:#e2e8f0" title="Reiniciar posiciones" onclick="boardReset()">${ic('repeat')}</button>
+      </div>
+    </div>
+    <div class="board-wrap"><canvas id="board-cv"></canvas></div>
+    <div class="board-tools" id="board-tools"></div>
+  </div>`;
+  renderBoardTools();
+  const cv = document.getElementById('board-cv');
+  cv.addEventListener('pointerdown', boardDown); cv.addEventListener('pointermove', boardMove);
+  cv.addEventListener('pointerup', boardUp); cv.addEventListener('pointercancel', boardUp);
+  window.addEventListener('resize', boardResize);
+  requestAnimationFrame(boardResize);
+}
+function closeBoard(){ window.removeEventListener('resize', boardResize); document.getElementById('board-root').innerHTML = ''; }
+function boardSet(k, v){ board[k] = v; renderBoardTools(); }
+function boardUndo(){ board.strokes.pop(); boardDraw(); }
+function boardClear(){ board.strokes = []; boardDraw(); }
+function boardReset(){ const { tool, color } = board; board = Object.assign(boardDefault(), { tool, color }); boardResize(); renderBoardTools(); }
+function boardAdd(kind){
+  const n = board.tokens.filter(t => t.kind === kind).length + 1;
+  board.tokens.push({ id:uid(), kind, n, u:.5, v: kind === 'B' ? .8 : .2 }); boardDraw();
+}
+function renderBoardTools(){
+  const tools = [['pen','edit','Lápiz'],['arrow','arrow','Flecha'],['erase','eraser','Borrar']];
+  document.getElementById('board-tools').innerHTML = `
+    <div class="trow">
+      ${tools.map(([id,icn,lb]) => `<button class="tb ${board.tool===id?'on':''}" onclick="boardSet('tool','${id}')">${ic(icn)} ${lb}</button>`).join('')}
+      <span class="sep"></span>
+      ${BOARD_COLORS.map(c => `<button class="sw ${board.color===c?'on':''}" style="background:${c}" onclick="boardSet('color','${c}')"></button>`).join('')}
+    </div>
+    <div class="trow">
+      <small style="color:#94a3b8;font-weight:700">Añadir:</small>
+      <button class="tb tok" style="background:${TOKEN_KINDS.A.fill};color:#fff" onclick="boardAdd('A')">A</button>
+      <button class="tb tok" style="background:${TOKEN_KINDS.B.fill};color:#fff" onclick="boardAdd('B')">B</button>
+      <button class="tb tok" style="background:${TOKEN_KINDS.E.fill};color:#fff" onclick="boardAdd('E')">E</button>
+      <button class="tb tok" style="background:#fde047;color:#713f12" onclick="boardAdd('ball')">${ic('ball')}</button>
+      <button class="tb tok" style="background:#fed7aa;color:#c2410c" onclick="boardAdd('cone')">▲</button>
+      <small style="color:#64748b;margin-left:6px">Arrastra las fichas · con <b>Borrar</b> las quitas</small>
+    </div>`;
+}
+function boardResize(){
+  const cv = document.getElementById('board-cv'); if (!cv) return;
+  const wrap = cv.parentElement; const W = wrap.clientWidth - 8, H = wrap.clientHeight - 8;
+  board.horiz = W > H;
+  const ratio = board.horiz ? 22/14 : 14/22;
+  let w = W, h = w / ratio; if (h > H) { h = H; w = h * ratio; }
+  const dpr = window.devicePixelRatio || 1;
+  cv.style.width = w + 'px'; cv.style.height = h + 'px'; cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+  boardDraw();
+}
+function boardGeom(cv){
+  const dpr = window.devicePixelRatio || 1; const w = cv.width / dpr, h = cv.height / dpr;
+  const P = (u, v) => board.horiz ? [v * w, (1 - u) * h] : [u * w, v * h];
+  const UV = (x, y) => board.horiz ? [1 - y / h, x / w] : [x / w, y / h];
+  return { w, h, dpr, P, UV, R: Math.max(13, Math.min(w, h) * 0.045) };
+}
+function boardDraw(){
+  const cv = document.getElementById('board-cv'); if (!cv || !board) return;
+  const ctx = cv.getContext('2d'); const { w, h, dpr, P, R } = boardGeom(cv);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, w, h);
+  const rect = (u0, v0, u1, v1) => { const [x0,y0] = P(u0,v0), [x1,y1] = P(u1,v1); return [Math.min(x0,x1), Math.min(y0,y1), Math.abs(x1-x0), Math.abs(y1-y0)]; };
+  const line = (a, b) => { ctx.beginPath(); ctx.moveTo(...a); ctx.lineTo(...b); ctx.stroke(); };
+  // Arena: zona libre y pista (8 × 16 m con 3 m de zona libre)
+  ctx.fillStyle = '#dcc48f'; ctx.fillRect(0, 0, w, h);
+  ctx.fillStyle = '#efdcaa'; ctx.fillRect(...rect(3/14, 3/22, 11/14, 19/22));
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 3; ctx.strokeRect(...rect(3/14, 3/22, 11/14, 19/22));
+  // Red y postes
+  ctx.strokeStyle = '#1e293b'; ctx.lineWidth = 4; ctx.setLineDash([7, 4]); line(P(2.5/14, .5), P(11.5/14, .5)); ctx.setLineDash([]);
+  ctx.fillStyle = '#1e293b'; [P(2.5/14, .5), P(11.5/14, .5)].forEach(([x,y]) => { ctx.beginPath(); ctx.arc(x, y, 5, 0, Math.PI*2); ctx.fill(); });
+  // Dibujos
+  board.strokes.forEach(s => drawStroke(ctx, s, P));
+  if (board.cur) drawStroke(ctx, board.cur, P);
+  // Fichas
+  board.tokens.forEach(t => drawToken(ctx, t, P, R));
+}
+function drawStroke(ctx, s, P){
+  if (s.pts.length < 1) return;
+  ctx.strokeStyle = s.color; ctx.fillStyle = s.color; ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  if (s.type === 'pen') {
+    ctx.beginPath(); s.pts.forEach((p, i) => { const [x,y] = P(p[0], p[1]); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }); ctx.stroke();
+  } else {
+    const [x0,y0] = P(...s.pts[0]), [x1,y1] = P(...s.pts[s.pts.length-1]);
+    const dx = x1-x0, dy = y1-y0, len = Math.hypot(dx, dy); if (len < 6) return;
+    const ang = Math.atan2(dy, dx), hl = 14;
+    ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1 - Math.cos(ang)*hl*.6, y1 - Math.sin(ang)*hl*.6); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x1, y1);
+    ctx.lineTo(x1 - hl*Math.cos(ang - .45), y1 - hl*Math.sin(ang - .45));
+    ctx.lineTo(x1 - hl*Math.cos(ang + .45), y1 - hl*Math.sin(ang + .45)); ctx.closePath(); ctx.fill();
+  }
+}
+function drawToken(ctx, t, P, R){
+  const [x,y] = P(t.u, t.v);
+  if (t.kind === 'cone') {
+    ctx.fillStyle = '#f97316'; ctx.strokeStyle = '#fff'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(x, y - R*.8); ctx.lineTo(x + R*.7, y + R*.6); ctx.lineTo(x - R*.7, y + R*.6); ctx.closePath(); ctx.fill(); ctx.stroke();
+    return;
+  }
+  if (t.kind === 'ball') {
+    const r = R * .7;
+    ctx.fillStyle = '#fde047'; ctx.strokeStyle = '#ca8a04'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x - r*.8, y - r*.3); ctx.quadraticCurveTo(x, y + r*.2, x + r*.8, y - r*.3); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x - r*.5, y + r*.7); ctx.quadraticCurveTo(x, y - r*.1, x + r*.5, y + r*.7); ctx.stroke();
+    return;
+  }
+  const k = TOKEN_KINDS[t.kind] || TOKEN_KINDS.A;
+  ctx.fillStyle = k.fill; ctx.strokeStyle = '#fff'; ctx.lineWidth = 2.5;
+  ctx.beginPath(); ctx.arc(x, y, R, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = '#fff'; ctx.font = `800 ${Math.round(R*.95)}px -apple-system,Segoe UI,Roboto,sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(`${k.label}${t.kind === 'E' ? '' : t.n}`, x, y + 1);
+}
+function boardPos(e){
+  const cv = e.currentTarget; const r = cv.getBoundingClientRect(); const { UV, P, R } = boardGeom(cv);
+  const x = e.clientX - r.left, y = e.clientY - r.top;
+  return { x, y, uv: UV(x, y), P, R };
+}
+function boardHit(x, y, P, R){
+  for (let i = board.tokens.length - 1; i >= 0; i--) { const [tx,ty] = P(board.tokens[i].u, board.tokens[i].v); if (Math.hypot(tx-x, ty-y) <= R + 4) return board.tokens[i]; }
+  return null;
+}
+function boardErase(x, y, P, R){
+  const hit = boardHit(x, y, P, R); if (hit) { board.tokens = board.tokens.filter(t => t !== hit); return; }
+  board.strokes = board.strokes.filter(s => !s.pts.some(p => { const [px,py] = P(p[0], p[1]); return Math.hypot(px-x, py-y) < 14; }));
+}
+function boardDown(e){
+  if (board.drag || board.cur) return;
+  e.preventDefault(); e.currentTarget.setPointerCapture(e.pointerId);
+  const { x, y, uv, P, R } = boardPos(e);
+  if (board.tool === 'erase') { board.pid = e.pointerId; board.erasing = true; boardErase(x, y, P, R); boardDraw(); return; }
+  const hit = boardHit(x, y, P, R);
+  if (hit) { const [tx,ty] = P(hit.u, hit.v); board.drag = { t: hit, dx: tx - x, dy: ty - y, pid: e.pointerId }; board.tokens = [...board.tokens.filter(t => t !== hit), hit]; return; }
+  board.cur = { type: board.tool, color: board.color, pts: [uv], pid: e.pointerId };
+}
+function boardMove(e){
+  const { x, y, P, R, UV } = boardPos(e);
+  if (board.erasing && board.pid === e.pointerId) { boardErase(x, y, P, R); boardDraw(); return; }
+  if (board.drag && board.drag.pid === e.pointerId) {
+    const [u, v] = UV(x + board.drag.dx, y + board.drag.dy);
+    board.drag.t.u = Math.min(1, Math.max(0, u)); board.drag.t.v = Math.min(1, Math.max(0, v)); boardDraw(); return;
+  }
+  if (board.cur && board.cur.pid === e.pointerId) { board.cur.pts.push(UV(x, y)); boardDraw(); }
+}
+function boardUp(e){
+  if (board.erasing && board.pid === e.pointerId) { board.erasing = false; return; }
+  if (board.drag && board.drag.pid === e.pointerId) { board.drag = null; return; }
+  if (board.cur && board.cur.pid === e.pointerId) { if (board.cur.pts.length > 1) board.strokes.push(board.cur); board.cur = null; boardDraw(); }
 }
 
 /* ============================ EJERCICIOS ============================ */
@@ -926,7 +1368,6 @@ function deleteLevel(id){
 /* ============================ AJUSTES ============================ */
 function renderAjustes(){
   const canShare = !!(navigator.share && navigator.canShare);
-  const standalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
   return `
   <h2 style="margin-top:6px"><span class="t">${ic('database')} Copia de seguridad</span></h2>
   <div class="card">
@@ -936,16 +1377,6 @@ function renderAjustes(){
       ${canShare ? `<button class="btn grow" onclick="shareData()">${ic('share')} Compartir</button>` : ''}
     </div>
     <label class="btn block" style="cursor:pointer">${ic('upload')} Importar copia<input type="file" accept="application/json,.json" style="display:none" onchange="importData(this)"></label>
-  </div>
-
-  <h2><span class="t">${ic('phone')} Tenerla en el móvil</span></h2>
-  <div class="card hint">
-    ${standalone ? `<b style="color:var(--ok)">${ic('check')} Ya estás usando la app instalada.</b><br><br>` : ''}
-    <b>iPhone (Safari):</b>
-    <ol><li>Abre la dirección de la app en Safari.</li><li>Botón <b>Compartir</b> (cuadrado con flecha) → <b>Añadir a pantalla de inicio</b>.</li></ol>
-    <b>Android (Chrome):</b>
-    <ol><li>Abre la dirección de la app en Chrome.</li><li>Menú ⋮ → <b>Instalar app</b> / <b>Añadir a la pantalla de inicio</b>.</li></ol>
-    Una vez instalada funciona sin conexión. Los datos se quedan en el móvil; usa <b>Exportar</b> para no perderlos si borras el navegador.
   </div>
 
   <h2><span class="t">${ic('info')} Datos</span></h2>
